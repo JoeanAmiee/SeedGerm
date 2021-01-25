@@ -20,7 +20,7 @@ class AddExperiment(Tkinter.Toplevel):
         self.app = app
         self.db = Experiment.database
 
-        self.title("Add experiment")
+        self.title("添加实验")
         self.resizable(width=False, height=False)
         self.iconbitmap(
 
@@ -28,20 +28,20 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.name_label = Tkinter.Label(
             master=self,
-            text="Experiment name: ",
+            text="实验名称: ",
             anchor=Tkinter.W
         )
         self.name_entry = Tkinter.Entry(master=self)
 
         self.dir_label = Tkinter.Label(
             master=self,
-            text="Image directory: ",
+            text="图像文件夹: ",
             anchor=Tkinter.W
         )
         self.dir_entry = Tkinter.Entry(master=self)
         self.dir_button = Tkinter.Button(
             master=self,
-            text="...",
+            text="选择路径",
             padx=5,
             pady=0,
             command=self._get_exp_dir
@@ -49,7 +49,7 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.species_label = Tkinter.Label(
             master=self,
-            text="Species: ",
+            text="种类: ",
             anchor=Tkinter.W
         )
         self.species_var = Tkinter.StringVar(self)
@@ -63,7 +63,7 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.bg_rm_label = Tkinter.Label(
             master=self,
-            text="BG remover: ",
+            text="背景算法: ",
             anchor=Tkinter.W
         )
         self.removers_var = Tkinter.StringVar(self)
@@ -77,41 +77,41 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.panel_num_label = Tkinter.Label(
             master=self,
-            text="Number of panels: ",
+            text="面板数量: ",
             anchor=Tkinter.W
         )
         self.panel_num_entry = Tkinter.Entry(master=self)
 
         self.seeds_per_panel_row_label = Tkinter.Label(
             master=self,
-            text="Rows: ",
+            text="种子行数: ",
             anchor=Tkinter.W
         )
         self.seeds_per_panel_row_entry = Tkinter.Entry(master=self)
 
         self.seeds_per_panel_col_label = Tkinter.Label(
             master=self,
-            text="Columns: ",
+            text="种子列数: ",
             anchor=Tkinter.W
         )
         self.seeds_per_panel_col_entry = Tkinter.Entry(master=self)
 
         self.start_image_label = Tkinter.Label(
             master=self,
-            text="Start image: ",
+            text="起始图像索引: ",
             anchor=Tkinter.W
         )
         self.start_image_entry = Tkinter.Entry(master=self)
         self.end_image_label = Tkinter.Label(
             master=self,
-            text="End image: ",
+            text="结束图像索引: ",
             anchor=Tkinter.W
         )
         self.end_image_entry = Tkinter.Entry(master=self)
 
         self.use_colour_label = Tkinter.Label(
             master=self,
-            text="Use colour: ",
+            text="使用颜色特征: ",
             anchor=Tkinter.W
         )
         self.use_colour = Tkinter.IntVar(self)
@@ -119,7 +119,7 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.use_delta_features = Tkinter.Label(
             master=self,
-            text="Use delta features: ",
+            text="使用增量要素: ",
             anchor=Tkinter.W
         )
         self.use_delta = Tkinter.IntVar(self)
@@ -127,14 +127,14 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.cancel_button = Tkinter.Button(
             master=self,
-            text="Cancel",
+            text="取消",
             command=self._cancel,
             padx=16
         )
 
         self.add_button = Tkinter.Button(
             master=self,
-            text="Add",
+            text="确认",
             command=self._add,
         )
 
@@ -333,7 +333,7 @@ class AddExperiment(Tkinter.Toplevel):
         for cond, msg in warn_conds:
             if cond:
                 messagebox.showwarning(
-                    "Add experiment",
+                    "添加实验",
                     msg
                 )
                 return False
@@ -364,11 +364,11 @@ class AddExperiment(Tkinter.Toplevel):
         use_colour = self.use_colour.get()
         use_delta = self.use_delta.get()
         pre_conditions = [
-            (len(name) < 1, "Experiment name is too short"),
-            (len(dir_) < 1, "Need to enter a directory"),
-            (len(panel_n) < 1, "Need to enter the number of panels"),
-            (len(seeds_col_n) < 1, "Need to enter the number of seeds per column"),
-            (len(seeds_row_n) < 1, "Need to enter the number of seeds per row"),
+            (len(name) < 1, "请输入实验名称"),
+            (len(dir_) < 1, "请输入图像路径"),
+            (len(panel_n) < 1, "请输入面板数量"),
+            (len(seeds_col_n) < 1, "请输入每列的种子数"),
+            (len(seeds_row_n) < 1, "请输入每行的种子数"),
             (len(start_img) < 1, "Need to enter start image index"),
             (len(end_img) < 1, "Need to enter end image index")
         ]
@@ -379,15 +379,15 @@ class AddExperiment(Tkinter.Toplevel):
 
         post_conditions = [
             (self.db.get(where("name") == name) is not None,
-             "Experiment with this name already exists"),
-            (not os.path.exists(dir_), "Cannot find experiment directory"),
+             "实验名称与已有的实验重复"),
+            (not os.path.exists(dir_), "图像文件夹不存在"),
             (len(os.listdir(dir_)) < 1,
-             "Directory does not contain any files"),
-            (not self._is_int(panel_n), "Panel value needs to be an integer"),
-            (not self._is_int(seeds_row_n), "Seeds row value needs to be an integer"),
-            (not self._is_int(seeds_col_n), "Seeds column value needs to be an integer"),
-            (not self._is_int(start_img), "Start image index needs to be an integer"),
-            (not self._is_int(end_img), "End image index needs to be an integer")
+             "图像文件夹为空"),
+            (not self._is_int(panel_n), "面板数量必须是整数"),
+            (not self._is_int(seeds_row_n), "种子行数必须是整数"),
+            (not self._is_int(seeds_col_n), "种子列数必须是整数"),
+            (not self._is_int(start_img), "起始图像索引必须是整数"),
+            (not self._is_int(end_img), "结束图像索引必须是整数")
         ]
 
         if not self._warning_conditions(post_conditions):
@@ -407,7 +407,7 @@ class AddExperiment(Tkinter.Toplevel):
             start_img = 0
         if not imgs:
             messagebox.showwarning("Warning",
-                                     "Cannot find images in directory: {}".format(dir_))
+                                     "图像文件夹不存在: {}".format(dir_))
             self.app.lift()
             return
 

@@ -5,7 +5,7 @@ import sys
 
 
 about_text = """
-SeedGerm - Beta release
+SeedGerm - Beta release（翻译：游永全）
 
 Property of: Crop Phenomics Group, Earlham Institute, Norwich Research Park, UK
 
@@ -19,7 +19,7 @@ class AboutWindow(Tkinter.Toplevel):
     
     def __init__(self, exp):
         Tkinter.Toplevel.__init__(self)
-        self.title("About SeedGerm")
+        self.title("关于 SeedGerm")
         self.resizable(width=False, height=False)
         self.wm_geometry("420x250")
         self.iconbitmap('.\logo.ico')

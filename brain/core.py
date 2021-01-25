@@ -2,9 +2,8 @@
 
 """ core.py - Runs a thread for performing heavy processing along side the GUI.
 
-Controls the starting of image processing threads for germination experiments. 
-Further used to perform any heavy processing so that the GUI thread doesn't 
-hang when the user is interacting with the application.
+控制用于发芽实验的图像处理线程的启动。
+进一步用于执行任何繁重的处理，以便在用户与应用程序交互时GUI线程不会挂起。
 """
 
 import threading
@@ -48,11 +47,11 @@ class Core(threading.Thread):
             time.sleep(0.5)
 
     def set_gui(self, gui):
-        """ Set a handle to the gui application. """
+        """ 设置gui应用程序的句柄。 """
         self.gui = gui
 
     def die(self):
-        """ Handle the stopping of this thread and any children threads. """
+        """ 处理此线程和所有子线程的停止。 """
         self.running = False
         
         for ip in self.current_experiment_threads.values():
@@ -65,11 +64,11 @@ class Core(threading.Thread):
         if self.current_experiment_threads[eid].running:
             return
          
-        # If we get here then the experiment has been processing but is no longer running.
+        # 如果我们到了这里，那么实验已经在进行中，但不再运行。
         del self.current_experiment_threads[eid]
          
     def start_processor(self, exp):
-        """ Start processing of image experiments. """
+        """ 开始图像处理实验。 """
         if exp.eid not in self.current_experiment_threads.keys():
             self.current_experiment_threads[exp.eid] = ImageProcessor(self, self.gui, exp)
             self.current_experiment_threads[exp.eid].start()

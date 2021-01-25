@@ -73,7 +73,7 @@ class Experiment(object):
         if self._eid is not value:
             self._eid = value
             self.database.update(vars(self), eids=[self.eid])
-            # don't need to update GUI
+            # 不需要更新GUI
 
     def get_results_dir(self):
         return os.path.join(self.exp_path, Experiment.sub_directories[2])

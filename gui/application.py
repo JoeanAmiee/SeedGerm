@@ -45,18 +45,18 @@ class Application(Tkinter.Tk):
         self.GREEN = "#80ff80"
         self.RED = "#ff8080"
 
-        # Define and build main application menu.
+        # 定义和构建主应用程序菜单。
         self.menu = Tkinter.Menu(self)
         menu_config = collections.OrderedDict([
             ('File', [
-                ('command', 'Add experiment', self._add_experiment),
+                ('command', '添加实验', self._add_experiment),
                 ('separator', None, None),
-                ('command', 'Quit', self._quit)
+                ('command', '退出', self._quit)
             ]),
             ('Help', [
                 ('command', 'Documentation', self._documentation),
                 ('separator', None, None),
-                ('command', 'About', self._about)
+                ('command', '关于', self._about)
             ])
         ])
         self._build_menu(self.menu, "main_menu_item", menu_config)
