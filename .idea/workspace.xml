@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="685acb6c-4a35-45fc-8fa8-772401073731" name="默认的" comment="">
+    <list default="true" id="24d76de8-0951-4f58-b3f1-94e543936b73" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/SeedGerm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SeedGerm.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/R_User_Library.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/4/d/4d15c916b468be84a1cc413e59c46f505a9cff54" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/b/db95313b9360723ec93e8b56004f97b6337396f6" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/1/f1bdda93d9a278e358509d498e17d97764c1fb29" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/f/8/f86871be55c50b1a4011baa87950a5bfeca7ae41" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/aboutwindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/aboutwindow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/helper/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/helper/experiment.py" afterDir="false" />
@@ -27,7 +19,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectId" id="1nZ6YRlDhKKc0U0jGh5n8EupQcR" />
+  <component name="ProjectId" id="1naUUrNjYLiliuaLXI7ZGseQzJ0" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -42,12 +34,13 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="默认任务">
-      <changelist id="685acb6c-4a35-45fc-8fa8-772401073731" name="默认的" comment="" />
-      <created>1611585318185</created>
+      <changelist id="24d76de8-0951-4f58-b3f1-94e543936b73" name="默认的" comment="" />
+      <created>1611627718247</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1611585318185</updated>
-      <workItem from="1611585322338" duration="176000" />
+      <updated>1611627718247</updated>
+      <workItem from="1611627723180" duration="188000" />
+      <workItem from="1611627943409" duration="297000" />
     </task>
     <servers />
   </component>

@@ -9,7 +9,7 @@ SeedGerm - Beta release（翻译：游永全）
 
 Property of: Crop Phenomics Group, Earlham Institute, Norwich Research Park, UK
 
-Authors:  Joshua Colmer, Aaron Bostrom, Ji Zhou, Danny Websdale, Thomas Le Cornu, Joshua Ball
+作者:  Joshua Colmer, Aaron Bostrom, Ji Zhou, Danny Websdale, Thomas Le Cornu, Joshua Ball
 """
 
 

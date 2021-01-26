@@ -38,7 +38,7 @@ class Experiment(object):
 
     @property
     def seeds_n(self):
-        return self.seeds_col_n*self.seeds_row_n
+        return self.seeds_col_n * self.seeds_row_n
 
     @property
     def status(self):
@@ -58,21 +58,24 @@ class Experiment(object):
     def yuv_ranges_set(self, value):
         if self._yuv_ranges_set is not value:
             self._yuv_ranges_set = value
-            self.database.update(vars(self), eids=[self.eid])
+            # self.database.update(vars(self), eids=[self.eid])
+            self.database.update(vars(self))
             Experiment.updated = True
 
     @status.setter
     def status(self, value):
         if self._status is not value:
             self._status = value
-            self.database.update(vars(self), eids=[self.eid])
+            # self.database.update(vars(self), eids=[self.eid])
+            self.database.update(vars(self))
             Experiment.updated = True
 
     @eid.setter
     def eid(self, value):
         if self._eid is not value:
             self._eid = value
-            self.database.update(vars(self), eids=[self.eid])
+            # self.database.update(vars(self), eids=[self.eid])
+            self.database.update(vars(self))
             # 不需要更新GUI
 
     def get_results_dir(self):
