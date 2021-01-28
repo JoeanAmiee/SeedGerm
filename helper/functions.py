@@ -65,11 +65,13 @@ def get_images_from_dir(path):
             pass
 
     if jpg_files and png_files:
-        print("Found both jpeg and png files in the directory....")
+        # print("Found both jpeg and png files in the directory....")
+        print("图像文件夹内存在jpeg和png两种格式的图像")
         return []
 
     if not jpg_files and not png_files:
-        print("Could not find any images in directory....")
+        # print("Could not find any images in directory....")
+        print("图像文件夹内没有找到图像")
         return []
 
     file_list = jpg_files if jpg_files else png_files
@@ -80,7 +82,8 @@ def get_images_from_dir(path):
         elif re_2:
             file_list = sorted(file_list, key=lambda s: int(re.findall('_(\d+)\.', s)[0]))
     except:
-        print("Could not perform regexp on files.")
+        # print("Could not perform regexp on files.")
+        print("文件名无法匹配")
         return []
 
     return file_list
@@ -356,11 +359,12 @@ def in_range(img, low, high):
 
 def rgb2ycrcb(img):
     img = img.astype(np.float)
-    
     r = img[:, :, 0]
-    g = img[:, :, 1]
-    b = img[:, :, 2]
-    
+    # g = img[:, :, 1]
+    g = img[:, :, :]
+    # b = img[:, :, 2]
+    b = img[:, :, :]
+
     Y = (r * 0.299) + (g * 0.587) + (b * 0.114)
     
     cr = ((r - Y) * 0.713) + 128.

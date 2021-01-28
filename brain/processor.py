@@ -1,23 +1,20 @@
 # -*- coding: utf-8 -*-
 
-""" processor.py - Handles the main processing of the germination experiments.
+""" processor.py - 主要处理发芽实验。
 
-Sets up experiment directory variables for reading and writing data. Includes
-various functions for processing the data for each of the main parts of the 
-processing. Data is produced at all stages for checking that processes have 
-functioned correctly.
+设置用于读取和写入数据的实验目录变量。包括用于处理每个主要处理部分的数据的各种函数。所有阶段都会生成数据，以检查流程是否正常运行。
 
-Processing of an experiment runs as follows:
-a.  Requires user to have set the YUV ranges.
-1.  Save initial image.
-2.  Extract panels and save data.
-3.  Save contour image showing extracted panel boundaries.
-4.  Extract bg/fg pixels and train ensemble classifiers.
-5.  Remove backgrounds producing fg masks for each image.
-6.  Label the seed positions using the first few frames.
-7.  Perform the germination classification.
-8.  Analyse the results producing the required output data.
-9.  Perform quantification of the seed morphological and colour data.
+实验过程如下：
+a.  需要用户设置YUV范围。
+1.  保存初始图像。
+2.  提取面板并保存数据。
+3.  保存显示提取的面板边界的等高线图像。
+4.  提取bg/fg像素并训练集成分类器。
+5.  移除为每个图像生成fg遮罩的背景。
+6.  使用前几帧标记种子位置。
+7.  进行发芽分类。
+8.  分析结果产生所需的输出数据。
+9.  对种子形态和颜色数据进行量化。
 """
 
 import copy
@@ -43,7 +40,7 @@ from operator import itemgetter
 # Imaging/vision imports.
 from scipy.ndimage.morphology import binary_fill_holes
 from skimage.transform import resize
-# Machine learning and statistics imports.
+# 机器学习和统计。
 from skimage.morphology import *
 from skimage.segmentation import clear_border
 from sklearn.linear_model import SGDClassifier
@@ -59,7 +56,7 @@ from imageio import imread
 import warnings
 warnings.filterwarnings("ignore")
 
-# Enables ability to reproduce results
+# 能够重现结果
 np.random.seed(0)
 random.seed(0)
 
@@ -83,7 +80,7 @@ def get_crop_shape(target, refer):
 
 
 def create_unet(img_shape, num_class):
-    # Define and return the U-Net model, e.g. number of layers, number of filters, activation function, etc.
+    # 定义并返回U-Net模型，例如层数、过滤器数、激活函数等。
 
     concat_axis = 3
     inputs = layers.Input(shape=img_shape)
@@ -149,7 +146,7 @@ def compare_pts(pt1, pt2):
 
 class ImageProcessor(threading.Thread):
     def __init__(self, core=None, app=None, experiment=None):
-        """ Set and generate required experiment data variables. """
+        """ 设置并生成所需的实验数据变量。 """
         super(ImageProcessor, self).__init__()
 
         self.core = core
@@ -160,7 +157,7 @@ class ImageProcessor(threading.Thread):
         self.all_masks = []
         self.total_stats = []
 
-        # Read image file names for the experiments, sort based on image number
+        # 读取实验图像文件名，按图像编号排序
         self.imgs = get_images_from_dir(self.exp.img_path)
         self.all_imgs = [pj(self.exp.img_path, el) for el in self.imgs]
 
@@ -201,7 +198,7 @@ class ImageProcessor(threading.Thread):
             pass
 
     def _save_init_image(self, img):
-        # Saves the initial RGB image of the experiment
+        # 保存实验的初始RGB图像
         out_f = pj(self.exp_images_dir, "init_img.jpg")
         if os.path.exists(out_f):
             return
@@ -212,14 +209,14 @@ class ImageProcessor(threading.Thread):
         plt.close(fig)
 
     def _yuv_clip_image(self, img_f):
-        # Returns a binary mask of an image using the manually set thresholds
+        # 使用手动设置的阈值返回图像的二进制掩码
         img = self.all_imgs_list[img_f]
         img_yuv = rgb2ycrcb(img)
         mask_img = in_range(img_yuv, self.yuv_low, self.yuv_high)
         return mask_img.astype(np.bool)
 
     def _yuv_clip_panel_image(self, img_f, p):
-        # Returns a binary mask of an image of a panel using the individual panel thresholds
+        # 使用单个面板阈值返回面板图像的二进制掩码
         img = self.all_imgs_list[img_f]
         img_yuv = rgb2ycrcb(img)
         self.yuv_panel_json_file = os.path.join(
@@ -240,7 +237,7 @@ class ImageProcessor(threading.Thread):
         return mask_img.astype(np.bool)
 
     def _extract_panels(self, img, chunk_no, chunk_reverse, img_idx):
-        # If panel data already exists, load it
+        # 如果面板数据已经存在，请加载它
         panel_data_f = os.path.join(self.exp_gzdata_dir, "panel_data.pkl")
         if os.path.exists(panel_data_f):
             with open(panel_data_f, 'rb') as fh:
@@ -250,7 +247,7 @@ class ImageProcessor(threading.Thread):
                 except EOFError:
                     print("pickle is broken")
 
-        # Obtain binary mask using the set YUV thresholds
+        # 使用设置的YUV阈值获取二进制掩码
         mask_img = self._yuv_clip_image(img_idx)
         mask_img = remove_small_objects(
                    fill_border(mask_img, 10, fillval=False),

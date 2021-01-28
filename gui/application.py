@@ -25,6 +25,8 @@ from gui.maskviewer import MaskViewer
 from gui.germinationviewer import GerminationViewer
 from helper.experiment import Experiment
 import warnings
+from tinydb import Query
+
 warnings.filterwarnings("ignore")
 
 
@@ -33,6 +35,7 @@ class Application(Tkinter.Tk):
     def __init__(self):
         Tkinter.Tk.__init__(self)
         self.db = Experiment.database
+        self.query = Query()
 
         self.protocol("WM_DELETE_WINDOW", self._quit)
         self.title("SeedGerm - Beta Release")
@@ -48,13 +51,13 @@ class Application(Tkinter.Tk):
         # 定义和构建主应用程序菜单。
         self.menu = Tkinter.Menu(self)
         menu_config = collections.OrderedDict([
-            ('File', [
+            ('文件', [
                 ('command', '添加实验', self._add_experiment),
                 ('separator', None, None),
                 ('command', '退出', self._quit)
             ]),
-            ('Help', [
-                ('command', 'Documentation', self._documentation),
+            ('帮助', [
+                ('command', '文档', self._documentation),
                 ('separator', None, None),
                 ('command', '关于', self._about)
             ])
@@ -63,11 +66,11 @@ class Application(Tkinter.Tk):
         self.configure(menu=self.menu)
 
         self.tree_columns = [
-            "Name",
-            "Species",
-            "# panels",
-            "# images",
-            "Status"
+            "实验名称",
+            "品种",
+            "面板数量",
+            "图像数量",
+            "状态"
         ]
         self.treeview = ttk.Treeview(
             master=self,
@@ -83,11 +86,11 @@ class Application(Tkinter.Tk):
 
         self._populate_experiment_table()
 
-        self.treeview.column("Name", width=250)
-        self.treeview.column("Species", width=100)
-        self.treeview.column("# panels", width=100)
-        self.treeview.column("# images", width=100)
-        self.treeview.column("Status", width=150)
+        self.treeview.column("实验名称", width=250)
+        self.treeview.column("品种", width=100)
+        self.treeview.column("面板数量", width=100)
+        self.treeview.column("图像数量", width=100)
+        self.treeview.column("状态", width=100)
 
         self.vsb_1 = ttk.Scrollbar(
             master=self,
@@ -129,7 +132,7 @@ class Application(Tkinter.Tk):
         self.hsb_1.grid(
             in_=self,
             column=1,
-            #columnspan=2,
+            # columnspan=2,
             row=2,
             sticky='news'
         )
@@ -141,8 +144,8 @@ class Application(Tkinter.Tk):
             sticky='news'
         )
 
-        # bind the table menu to right-click on the treeview
-#        self.treeview.bind("<Button-3>", self._table_menu_right_click)
+        # 绑定菜单，右键单击视图
+        #        self.treeview.bind("<Button-3>", self._table_menu_right_click)
         if sys.platform == 'darwin':
             self.treeview.bind("<Button-2>", self._table_menu_right_click)
         else:
@@ -150,40 +153,39 @@ class Application(Tkinter.Tk):
 
         self.treeview.bind("<Double-1>", self._treeview_dbl)
 
-        # Define and build the right-click Table Menu
+        # 定义并构建右键单击的菜单
         self.table_menu = Tkinter.Menu(self, tearoff=0)
         table_menu_config = [
-            ('command', 'Set YUV ranges', self._set_yuv_ranges),
+            ('command', '设置YUV阈值', self._set_yuv_ranges),
             ('separator', None, None),
-            ('command', 'Set YUV_panel ranges', self._set_yuv_panel_ranges),
+            ('command', '设置YUV面板阈值', self._set_yuv_panel_ranges),
             ('separator', None, None),
-            ('command', 'Process images', self._process_images),
+            ('command', '处理图像', self._process_images),
             ('separator', None, None),
-            ('command', 'View results', self._view_results),
-            ('command', 'View images', self._view_images),
-            ('command', 'View seed masks', self._view_seed_masks),
-           # ('command', 'View germination', self._view_algo_desc),
+            ('command', '查看实验结果', self._view_results),
+            ('command', '查看图像', self._view_images),
+            ('command', '查看种子遮罩', self._view_seed_masks),
+            # ('command', 'View germination', self._view_algo_desc),
             ('separator', None, None),
-            ('command', 'Save results', self._save_results),
-            ('command', 'Save masks', self._save_masks),
+            ('command', '保存结果', self._save_results),
+            ('command', '保存遮罩', self._save_masks),
             ('separator', None, None),
-            ('command', 'Edit', self._edit_exp),
-            ('command', 'Reset', self._reset_exp),
+            ('command', '编辑实验', self._edit_exp),
+            ('command', '重置实验', self._reset_exp),
             ('separator', None, None),
-            ('command', 'Delete', self._del_exp),
+            ('command', '删除实验', self._del_exp),
             ('separator', None, None),
-            ('command', 'Cancel', None),
+            ('command', '取消', None),
         ]
         self._menu_commands(self.table_menu, table_menu_config)
 
         self.db_updated = False
         self._refresh_exp()
 
-
     @property
     def experiments(self):
-        #when we init the app, we want to constuct the experiment objects once.
-        #these can be extracted back to maps later when we update.
+        # 当我们初始化应用程序时，我们要构造一次实验对象。
+        # these can be extracted back to maps later when we update.
         if self._experiments is None:
             self._experiments = [Experiment(**x) for x in self.db.all()]
 
@@ -191,7 +193,7 @@ class Application(Tkinter.Tk):
 
     def _refresh_exp(self):
         if Experiment.updated:
-            print("Refreshing GUI")
+            print("更新交互界面")
             self._populate_experiment_table()
             Experiment.updated = False
         self.after(100, self._refresh_exp)
@@ -202,21 +204,21 @@ class Application(Tkinter.Tk):
         if not self.experiments:
             return
 
-        # Populate the table with saved experiments.
+        # 用保存的实验填充表格。
         for exp in self.experiments:
 
             n_imgs = -1
             if not os.path.exists(exp.img_path):
-                print("Can't find this path...",  exp.img_path)
+                print("找不到图像文件夹", exp.img_path)
                 messagebox.showwarning("Experiment problem",
-                    "Can't find directory {} for experiment {}.".format(exp.img_path, exp.name))
-                exp.status = "Error"
+                                       "找不到实验{}的图像文件夹目录{}".format(exp.name, exp.img_path))
+                exp.status = "错误"
             else:
                 imgs = get_images_from_dir(exp.img_path)
                 n_imgs = len(imgs)
                 if not n_imgs:
                     messagebox.showwarning("Experiment problem",
-                                             "Problem with images for experiment {}.".format(exp.name))
+                                           "Problem with images for experiment {}.".format(exp.name))
                     exp.status = "Error"
 
             values = [
@@ -230,17 +232,17 @@ class Application(Tkinter.Tk):
             self.exp_treeview_ids[exp.eid] = e_item
 
     def _menu_commands(self, menu_obj, commands):
-            for t, l, fn in commands:
-                if t == "command":
-                    menu_obj.add_command(label=l, command=fn)
-                elif t == "separator":
-                    menu_obj.add_separator()
-                else:
-                    print("unknown menu type")
+        for t, l, fn in commands:
+            if t == "command":
+                menu_obj.add_command(label=l, command=fn)
+            elif t == "separator":
+                menu_obj.add_separator()
+            else:
+                print("unknown menu type")
 
     def _build_menu(self, menu, menu_item_name, menu_config):
         for idx, (key, value) in enumerate(menu_config.items()):
-            # Create menu item key and object, and set as class variable.
+            # 创建菜单项键和对象，并设置为类变量。
             menu_item_key = "%s_%d" % (menu_item_name, idx)
             new_menu_obj = Tkinter.Menu(menu, tearoff=0)
             self.__dict__[menu_item_key] = new_menu_obj
@@ -250,15 +252,13 @@ class Application(Tkinter.Tk):
             self._menu_commands(new_menu_obj, value)
 
     def _table_menu_right_click(self, event):
-        """ Get the item that has been right-clicked and display the
-        relevant menu.
-        """
+        """获取已右键单击的项目并显示相关菜单。"""
         if len(self.treeview.get_children()) == 0:
-            # we don't want to do anything if no files are imported
+            # 如果没有导入文件，我们什么都不想做
             return
-        # post the event to the table menu
+        # 将事件发布到菜单
         item_id = self.treeview.identify_row(event.y)
-        # user clicked on header and not an element
+        # 用户单击了标题而不是元素
         if not len(item_id):
             return
         self.treeview.selection_set(item_id)
@@ -288,7 +288,7 @@ class Application(Tkinter.Tk):
     def _process_images(self):
         print("Preparing to process image series")
         exp = self._get_exp()
-        # If the user hasn't labelled panels for this experiment we can't process the experiment
+        # 如果用户没有为这个实验设置YUV阈值，我们就不能处理这个实验
         if not exp.yuv_ranges_set:
             messagebox.showwarning(
                 "",
@@ -298,7 +298,7 @@ class Application(Tkinter.Tk):
 
         self.info_label.config(background=self.GREEN)
 
-        exp.status = "Running"
+        exp.status = "运行中"
         self.core.start_processor(exp)
 
     def _save_results(self):
@@ -340,18 +340,18 @@ class Application(Tkinter.Tk):
     def _view_algo_desc(self):
         self.germ_viewer = GerminationViewer(self._get_exp())
 
-#    def _label_panels(self):
-#        tkMessageBox.showinfo("", "Panel tool not supported.")
-#        exp = self._get_exp()
-#        print exp
-#        self.panel_tool = PanelTool(exp)
+    #    def _label_panels(self):
+    #        tkMessageBox.showinfo("", "Panel tool not supported.")
+    #        exp = self._get_exp()
+    #        print exp
+    #        self.panel_tool = PanelTool(exp)
 
     def _edit_exp(self):
         exp = self._get_exp()
         idx = self._get_exp_idx()
         self.add_experiment = EditExperiment(self, exp, idx)
 
-    #this destroys the experiment path of data. but keeps the experiment.
+    # this destroys the experiment path of data. but keeps the experiment.
     # will need to remake all the YUVs everything.
     def _reset_exp(self):
         exp = self._get_exp()
@@ -382,7 +382,7 @@ class Application(Tkinter.Tk):
                     ax = fig.add_subplot(111)
                     ax.imshow(mask)
 
-                    m,n = mask.shape
+                    m, n = mask.shape
                     ys, xs = [], []
                     for i, y, x in panel_seed_idxs[str(curr_panel)]:
                         if i == -1:
@@ -420,7 +420,6 @@ class Application(Tkinter.Tk):
 
         _thread.start_new_thread(Application._save_masks_function, (exp, sev_dir))
 
-
     def _del_exp(self):
         exp = self._get_exp()
         yes_remove = messagebox.askyesno(
@@ -430,7 +429,9 @@ class Application(Tkinter.Tk):
 
         if yes_remove:
             shutil.rmtree(exp.exp_path)
-            self.db.remove(eids=[exp.eid])
+
+            # self.db.remove(eids=[exp.eid])
+            self.db.remove(self.query.name == exp.eid)
             Experiment.updated = True
             self._experiments.remove(exp)
             self._populate_experiment_table()

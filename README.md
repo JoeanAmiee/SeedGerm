@@ -1,3 +1,4 @@
+**本项目暂不可用，需要使用请访问原项目：[https://github.com/Crop-Phenomics-Group/SeedGerm](https://github.com/Crop-Phenomics-Group/SeedGerm)**  
 # SeedGerm
 
 Joshua Colmer<sup>1</sup>, Aaron Bostrom<sup>1</sup>, Joshua Ball <sup>1</sup>, Daniel Reynolds<sup>1</sup>, Ji Zhou<sup>1,2,3*</sup>

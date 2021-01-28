@@ -17,10 +17,12 @@ from brain.processor import ImageProcessor
 import json
 from brain.speciesclassifier import SpeciesClassifier
 
+
 class Core(threading.Thread):
 
     def __init__(self):
         super(Core, self).__init__()
+        # threading.Thread.__init__(self)
         self.running = True
         self.current_experiment_threads = {}
         self._load_config_json()
@@ -35,7 +37,7 @@ class Core(threading.Thread):
         self.species_classes = {}
 
         for species in species_list:
-            obj = SpeciesClassifier(**species) #create object from dictionary
+            obj = SpeciesClassifier(**species)  # 从字典创建对象
             self.species_classes[obj.seed] = obj
             print(obj.seed)
 
@@ -53,20 +55,20 @@ class Core(threading.Thread):
     def die(self):
         """ 处理此线程和所有子线程的停止。 """
         self.running = False
-        
+
         for ip in self.current_experiment_threads.values():
             ip.running = False
 
     def stop_processor(self, eid):
         if eid not in self.current_experiment_threads.keys():
             return
-        
+
         if self.current_experiment_threads[eid].running:
             return
-         
+
         # 如果我们到了这里，那么实验已经在进行中，但不再运行。
         del self.current_experiment_threads[eid]
-         
+
     def start_processor(self, exp):
         """ 开始图像处理实验。 """
         if exp.eid not in self.current_experiment_threads.keys():
@@ -76,7 +78,7 @@ class Core(threading.Thread):
             if not self.current_experiment_threads[exp.eid].running:
                 self.stop_processor(exp.eid)
             else:
-                print("Currently processing experiment images")
+                print("正在处理实验图像")
 
     def zip_results(self, exp, out_dir):
         print(exp.name)

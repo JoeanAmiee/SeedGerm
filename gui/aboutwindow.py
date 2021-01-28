@@ -7,7 +7,7 @@ import sys
 about_text = """
 SeedGerm - Beta release（翻译：游永全）
 
-Property of: Crop Phenomics Group, Earlham Institute, Norwich Research Park, UK
+隶属: Crop Phenomics Group, Earlham Institute, Norwich Research Park, UK
 
 作者:  Joshua Colmer, Aaron Bostrom, Ji Zhou, Danny Websdale, Thomas Le Cornu, Joshua Ball
 """

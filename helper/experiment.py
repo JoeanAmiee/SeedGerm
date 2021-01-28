@@ -1,6 +1,6 @@
 import os
 import shutil
-
+from tinydb import Query
 from tinydb import TinyDB
 
 
@@ -9,6 +9,7 @@ class Experiment(object):
     sub_directories = ['masks', 'gzdata', 'results', 'images']
 
     database = TinyDB(db_path)
+    query = Query()
     updated = False
 
     def __init__(self, name=None, exp_path=None, img_path=None, panel_n=None, seeds_col_n=None, seeds_row_n=None,
@@ -59,7 +60,7 @@ class Experiment(object):
         if self._yuv_ranges_set is not value:
             self._yuv_ranges_set = value
             # self.database.update(vars(self), eids=[self.eid])
-            self.database.update(vars(self))
+            self.database.update(vars(self), self.query.name == self.eid)
             Experiment.updated = True
 
     @status.setter
@@ -67,7 +68,8 @@ class Experiment(object):
         if self._status is not value:
             self._status = value
             # self.database.update(vars(self), eids=[self.eid])
-            self.database.update(vars(self))
+            print(vars(self), self.eid)
+            self.database.update(vars(self), self.query == self['name'])
             Experiment.updated = True
 
     @eid.setter
@@ -75,7 +77,7 @@ class Experiment(object):
         if self._eid is not value:
             self._eid = value
             # self.database.update(vars(self), eids=[self.eid])
-            self.database.update(vars(self))
+            self.database.update(vars(self), self.query.name == self.eid)
             # 不需要更新GUI
 
     def get_results_dir(self):
@@ -97,7 +99,7 @@ class Experiment(object):
                 os.makedirs(os.path.join(self.exp_path, sub_dir))
 
     def reset(self):
-        # delete the tree and rebuild the dirs.
+        # 删除树并重建目录。
         if os.path.exists(self.exp_path):
             shutil.rmtree(self.exp_path)
             self.create_directories()
