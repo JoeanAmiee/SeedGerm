@@ -431,7 +431,7 @@ class Application(Tkinter.Tk):
             shutil.rmtree(exp.exp_path)
 
             # self.db.remove(eids=[exp.eid])
-            self.db.remove(self.query.name == exp.eid)
+            self.db.remove(self.query.name == exp.name)
             Experiment.updated = True
             self._experiments.remove(exp)
             self._populate_experiment_table()

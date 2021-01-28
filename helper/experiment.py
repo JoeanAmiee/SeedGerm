@@ -60,7 +60,7 @@ class Experiment(object):
         if self._yuv_ranges_set is not value:
             self._yuv_ranges_set = value
             # self.database.update(vars(self), eids=[self.eid])
-            self.database.update(vars(self), self.query.name == self.eid)
+            self.database.update(vars(self), self.query.name == vars(self)['name'])
             Experiment.updated = True
 
     @status.setter
@@ -68,8 +68,7 @@ class Experiment(object):
         if self._status is not value:
             self._status = value
             # self.database.update(vars(self), eids=[self.eid])
-            print(vars(self), self.eid)
-            self.database.update(vars(self), self.query == self['name'])
+            self.database.update(vars(self), self.query.name == vars(self)['name'])
             Experiment.updated = True
 
     @eid.setter
@@ -77,7 +76,7 @@ class Experiment(object):
         if self._eid is not value:
             self._eid = value
             # self.database.update(vars(self), eids=[self.eid])
-            self.database.update(vars(self), self.query.name == self.eid)
+            self.database.update(vars(self), self.query.name == vars(self)['name'])
             # 不需要更新GUI
 
     def get_results_dir(self):
