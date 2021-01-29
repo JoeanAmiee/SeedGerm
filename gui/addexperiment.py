@@ -35,7 +35,7 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.dir_label = Tkinter.Label(
             master=self,
-            text="图像文件夹: ",
+            text="图像路径: ",
             anchor=Tkinter.W
         )
         self.dir_entry = Tkinter.Entry(master=self)
@@ -49,7 +49,7 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.species_label = Tkinter.Label(
             master=self,
-            text="种类: ",
+            text="品种: ",
             anchor=Tkinter.W
         )
         self.species_var = Tkinter.StringVar(self)
@@ -98,13 +98,13 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.start_image_label = Tkinter.Label(
             master=self,
-            text="起始图像索引: ",
+            text="起始图像序号: ",
             anchor=Tkinter.W
         )
         self.start_image_entry = Tkinter.Entry(master=self)
         self.end_image_label = Tkinter.Label(
             master=self,
-            text="结束图像索引: ",
+            text="结束图像序号: ",
             anchor=Tkinter.W
         )
         self.end_image_entry = Tkinter.Entry(master=self)
@@ -407,7 +407,7 @@ class AddExperiment(Tkinter.Toplevel):
             start_img = 0
         if not imgs:
             messagebox.showwarning("Warning",
-                                     "图像文件夹不存在: {}".format(dir_))
+                                   "图像文件夹不存在: {}".format(dir_))
             self.app.lift()
             return
 

@@ -9,11 +9,15 @@ from tkinter import messagebox
 from tinydb import where
 from helper.functions import slugify, get_images_from_dir
 from helper.experiment import Experiment
+from tinydb import TinyDB
+from tinydb import Query
 
 pj = os.path.join
 
 
 class EditExperiment(Tkinter.Toplevel):
+    query = Query()
+
     def __init__(self, app, experiment, idx):
         Tkinter.Toplevel.__init__(self)
 
@@ -22,13 +26,13 @@ class EditExperiment(Tkinter.Toplevel):
         self.idx = idx
         self.experiment = experiment
 
-        self.title("Edit experiment")
+        self.title("编辑实验")
         self.resizable(width=False, height=False)
         self.iconbitmap('.\logo.ico')
 
         self.name_label = Tkinter.Label(
             master=self,
-            text="Experiment name: ",
+            text="实验名称: ",
             anchor=Tkinter.W
         )
         v = Tkinter.StringVar()
@@ -37,7 +41,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.dir_label = Tkinter.Label(
             master=self,
-            text="Image directory: ",
+            text="图像路径: ",
             anchor=Tkinter.W
         )
         v = Tkinter.StringVar()
@@ -45,7 +49,7 @@ class EditExperiment(Tkinter.Toplevel):
         v.set(experiment.img_path)
         self.dir_button = Tkinter.Button(
             master=self,
-            text="...",
+            text="选择路径",
             padx=5,
             pady=0,
             command=self._get_exp_dir
@@ -53,7 +57,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.species_label = Tkinter.Label(
             master=self,
-            text="Species: ",
+            text="品种: ",
             anchor=Tkinter.W
         )
         self.species_var = Tkinter.StringVar(self)
@@ -78,7 +82,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.bg_rm_label = Tkinter.Label(
             master=self,
-            text="BG remover: ",
+            text="背景算法: ",
             anchor=Tkinter.W
         )
         self.removers_var = Tkinter.StringVar(self)
@@ -99,7 +103,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.panel_num_label = Tkinter.Label(
             master=self,
-            text="Number of panels: ",
+            text="面板数量: ",
             anchor=Tkinter.W
         )
         v = Tkinter.StringVar()
@@ -108,7 +112,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.seeds_per_panel_row_label = Tkinter.Label(
             master=self,
-            text="Rows: ",
+            text="种子行数: ",
             anchor=Tkinter.W
         )
         v = Tkinter.StringVar()
@@ -117,7 +121,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.seeds_per_panel_col_label = Tkinter.Label(
             master=self,
-            text="Columns: ",
+            text="种子列数: ",
             anchor=Tkinter.W
         )
         v = Tkinter.StringVar()
@@ -126,7 +130,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.start_image_label = Tkinter.Label(
             master=self,
-            text="Start image: ",
+            text="起始图像序号: ",
             anchor=Tkinter.W
         )
         v = Tkinter.StringVar()
@@ -134,7 +138,7 @@ class EditExperiment(Tkinter.Toplevel):
         v.set(experiment.start_img)
         self.end_image_label = Tkinter.Label(
             master=self,
-            text="End image: ",
+            text="结束图像序号: ",
             anchor=Tkinter.W
         )
         v = Tkinter.StringVar()
@@ -143,7 +147,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.use_colour_label = Tkinter.Label(
             master=self,
-            text="Use colour: ",
+            text="使用颜色特征: ",
             anchor=Tkinter.W
         )
         self.use_colour = Tkinter.IntVar(self, value=experiment.use_colour)
@@ -151,7 +155,7 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.use_delta_features = Tkinter.Label(
             master=self,
-            text="Use delta features: ",
+            text="使用增量要素: ",
             anchor=Tkinter.W
         )
         self.use_delta = Tkinter.IntVar(self, value=experiment.use_delta)
@@ -159,14 +163,14 @@ class EditExperiment(Tkinter.Toplevel):
 
         self.cancel_button = Tkinter.Button(
             master=self,
-            text="Cancel",
+            text="取消",
             command=self._cancel,
             padx=16
         )
 
         self.add_button = Tkinter.Button(
             master=self,
-            text="Confirm",
+            text="确认",
             command=self._add,
         )
 
@@ -369,7 +373,7 @@ class EditExperiment(Tkinter.Toplevel):
                     msg
                 )
                 return False
-                # if we reach here then everything was okay
+                # 如果我们到了这里一切都会好起来的
         return True
 
     def _is_int(self, n):
@@ -444,7 +448,7 @@ class EditExperiment(Tkinter.Toplevel):
             start_img = 0
         if not imgs:
             messagebox.showwarning("Warning",
-                                     "Cannot find images in directory: {}".format(dir_))
+                                   "Cannot find images in directory: {}".format(dir_))
             self.app.lift()
             return
 
@@ -468,7 +472,7 @@ class EditExperiment(Tkinter.Toplevel):
         exp._eid = self.app._experiments[self.idx]._eid
         exp.eid = self.app._experiments[self.idx].eid
         self.app._experiments[self.idx] = exp
-
+        self.db.update(vars(exp), self.query._eid == exp.eid)
 
         self.destroy()
         self.app._populate_experiment_table()

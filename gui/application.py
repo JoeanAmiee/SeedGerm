@@ -219,7 +219,7 @@ class Application(Tkinter.Tk):
                 if not n_imgs:
                     messagebox.showwarning("Experiment problem",
                                            "Problem with images for experiment {}.".format(exp.name))
-                    exp.status = "Error"
+                    exp.status = "错误"
 
             values = [
                 exp.name,
@@ -351,13 +351,13 @@ class Application(Tkinter.Tk):
         idx = self._get_exp_idx()
         self.add_experiment = EditExperiment(self, exp, idx)
 
-    # this destroys the experiment path of data. but keeps the experiment.
-    # will need to remake all the YUVs everything.
+    # 这破坏了数据的实验路径。但我们继续实验。
+    # 将需要重新制作所有的yuv。
     def _reset_exp(self):
         exp = self._get_exp()
         yes_remove = messagebox.askyesno(
             "",
-            "Are you sure you want to reset this experiment?"
+            "是否要重置此实验？"
         )
 
         if yes_remove:
