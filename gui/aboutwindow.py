@@ -3,7 +3,6 @@
 import tkinter as Tkinter
 import sys
 
-
 about_text = """
 SeedGerm - Beta release（翻译：游永全）
 
@@ -14,9 +13,7 @@ SeedGerm - Beta release（翻译：游永全）
 
 
 class AboutWindow(Tkinter.Toplevel):
-    
 
-    
     def __init__(self, exp):
         Tkinter.Toplevel.__init__(self)
         self.title("关于 SeedGerm")
@@ -31,6 +28,3 @@ class AboutWindow(Tkinter.Toplevel):
 
         self.msg = Tkinter.Message(self, text=about_text)
         self.msg.pack()
-        
-      
-        

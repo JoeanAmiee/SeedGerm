@@ -26,6 +26,7 @@ from helper.experiment import Experiment
 from helper.functions import *
 from helper.panel_segmenter import fill_border
 import warnings
+
 warnings.filterwarnings("ignore")
 
 sns.set_style("white")
@@ -54,13 +55,20 @@ class YUVRanges(Tkinter.Toplevel):
         imgs = get_images_from_dir(img_path)
 
         img_01 = imread(os.path.join(img_path, imgs[start_img]))
-        img_01 = skimage.img_as_ubyte(rescale(img_01, 0.25))
+        # print(img_01.shape)
+        # img_01 = skimage.img_as_ubyte(rescale(img_01, 0.25))
+        img_01 = skimage.img_as_ubyte(rescale(img_01, [0.25, 0.25, 1]))
+        # print(img_01.shape)
+        """img_as_ubyte：转换图像数据类型，rescale：缩放图片"""
         img_02 = imread(os.path.join(img_path, imgs[start_img + int((end_img - start_img) / 3)]))
-        img_02 = skimage.img_as_ubyte(rescale(img_02, 0.25))
+        # img_02 = skimage.img_as_ubyte(rescale(img_02, 0.25))
+        img_02 = skimage.img_as_ubyte(rescale(img_02, [0.25, 0.25, 1]))
         img_03 = imread(os.path.join(img_path, imgs[start_img + int(2 * (end_img - start_img) / 3)]))
-        img_03 = skimage.img_as_ubyte(rescale(img_03, 0.25))
+        # img_03 = skimage.img_as_ubyte(rescale(img_03, 0.25))
+        img_03 = skimage.img_as_ubyte(rescale(img_03, [0.25, 0.25, 1]))
         img_04 = imread(os.path.join(img_path, imgs[end_img - 1]))
-        img_04 = skimage.img_as_ubyte(rescale(img_04, 0.25))
+        # img_04 = skimage.img_as_ubyte(rescale(img_04, 0.25))
+        img_04 = skimage.img_as_ubyte(rescale(img_04, [0.25, 0.25, 1]))
 
         self.img_01_yuv = rgb2ycrcb(img_01)
         self.img_01_rgb = img_01.copy() / 255.
@@ -84,7 +92,6 @@ class YUVRanges(Tkinter.Toplevel):
             tic.tick2line.set_visible = False
             tic.label1.set_visible = False
             tic.label2.set_visible = False
-
 
         for tic in self.ax.yaxis.get_major_ticks():
             tic.tick1On = tic.tick2On = False

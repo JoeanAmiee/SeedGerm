@@ -91,8 +91,9 @@ class SpeciesClassifier:
                 lengths.append([rp.minor_axis_length, rp.major_axis_length,
                                 float(rp.minor_axis_length + 1.0) / float(rp.major_axis_length + 1.0)])
                 lengths_labelled.append(np.hstack(([rp.minor_axis_length, rp.major_axis_length,
-                                            float(rp.minor_axis_length + 1.0) / float(rp.major_axis_length + 1.0)],
-                                           rp.label)))
+                                                    float(rp.minor_axis_length + 1.0) / float(
+                                                        rp.major_axis_length + 1.0)],
+                                                   rp.label)))
             # Append the list of seed features for that image to a list of all images' seed features
             initial_areas.append(np.array(areas_labelled))
             initial_lengths.append(np.array(lengths_labelled))
@@ -122,7 +123,8 @@ class SpeciesClassifier:
                                 next = np.argwhere(next_arr == id)
                                 # As the delta for the first image is undefined, set it to the difference between the first
                                 # and second image
-                                self.delta_area[counter, 0] = np.abs(initial_areas[i + 1][next, 0] - initial_areas[i][curr, 0])
+                                self.delta_area[counter, 0] = np.abs(
+                                    initial_areas[i + 1][next, 0] - initial_areas[i][curr, 0])
                                 self.delta_lengths[counter, :] = np.abs(
                                     initial_lengths[i + 1][next, :3] - initial_lengths[i][curr, :3])
                                 self.delta_hu_feas[counter, :] = np.abs(
@@ -157,12 +159,15 @@ class SpeciesClassifier:
         to_analyse = np.sum(item.shape[0] for item in initial_areas[:to_analyse])
         # Create array containing seed features from all images
         if self.use_delta:
-            self.all_data = np.hstack([hu_feas, self.delta_hu_feas, areas, self.delta_area, lengths, self.delta_lengths])
+            self.all_data = np.hstack(
+                [hu_feas, self.delta_hu_feas, areas, self.delta_area, lengths, self.delta_lengths])
         else:
             self.all_data = np.hstack([hu_feas, areas, lengths])
         # Create training data for one class SVM
         if self.use_delta:
-            hu_feas = np.hstack([hu_feas[:to_analyse, :], self.delta_hu_feas[:to_analyse, :], areas[:to_analyse, :], self.delta_area[:to_analyse, :], lengths[:to_analyse, :], self.delta_lengths[:to_analyse, :]]) #added in area and delta area.
+            hu_feas = np.hstack([hu_feas[:to_analyse, :], self.delta_hu_feas[:to_analyse, :], areas[:to_analyse, :],
+                                 self.delta_area[:to_analyse, :], lengths[:to_analyse, :],
+                                 self.delta_lengths[:to_analyse, :]])  # added in area and delta area.
         else:
             hu_feas = np.hstack([hu_feas[:to_analyse, :], areas[:to_analyse, :], lengths[:to_analyse, :]])
         if self.use_colour:
@@ -314,7 +319,7 @@ class SpeciesClassifier:
                 areas_total.append(m_rp.area)
                 hu_feas_total.append(m_rp.moments_hu)
                 lengths_total.append([m_rp.minor_axis_length, m_rp.major_axis_length,
-                                            float(m_rp.minor_axis_length + 1.0) / float(m_rp.major_axis_length + 1.0)])
+                                      float(m_rp.minor_axis_length + 1.0) / float(m_rp.major_axis_length + 1.0)])
 
             # For each seed in all the images.
             for idx, m in enumerate(seed_masks):
@@ -341,7 +346,8 @@ class SpeciesClassifier:
                 hu_feas.append(m_rp.moments_hu)
                 areas.append(m_rp.area)
                 # Apply Laplacian correction on the axis ratio to ensure it's not zero
-                lengths.append([m_rp.minor_axis_length, m_rp.major_axis_length, float(m_rp.minor_axis_length+1.0)/float(m_rp.major_axis_length+1.0)])
+                lengths.append([m_rp.minor_axis_length, m_rp.major_axis_length,
+                                float(m_rp.minor_axis_length + 1.0) / float(m_rp.major_axis_length + 1.0)])
 
             if list_error:
                 seed_classification[rp.label] = [0] * len(seed_masks)
@@ -360,7 +366,6 @@ class SpeciesClassifier:
                 print(type(cpa).__name__)
                 print(cpa.find_change_point(areas))'''
 
-
             areas = np.vstack(areas)
             hu_feas = np.vstack(hu_feas)
             lengths = np.vstack(lengths)
@@ -371,20 +376,21 @@ class SpeciesClassifier:
 
                 for j in range(areas.shape[0]):
                     if j == 0:
-                        delta_areas.append(areas[j+1]-areas[j])
-                        delta_hu_feas.append(hu_feas[j+1]-hu_feas[j])
-                        delta_lengths.append(lengths[j+1]-lengths[j])
+                        delta_areas.append(areas[j + 1] - areas[j])
+                        delta_hu_feas.append(hu_feas[j + 1] - hu_feas[j])
+                        delta_lengths.append(lengths[j + 1] - lengths[j])
                     else:
-                        delta_areas.append(areas[j]-areas[j-1])
-                        delta_hu_feas.append(hu_feas[j]-hu_feas[j-1])
-                        delta_lengths.append(lengths[j]-lengths[j-1])
+                        delta_areas.append(areas[j] - areas[j - 1])
+                        delta_hu_feas.append(hu_feas[j] - hu_feas[j - 1])
+                        delta_lengths.append(lengths[j] - lengths[j - 1])
 
                 delta_areas = np.vstack(delta_areas)
                 delta_lengths = np.vstack(delta_lengths)
                 delta_hu_feas = np.vstack(delta_hu_feas)
 
                 hu_feas = np.hstack(
-                    [hu_feas, delta_hu_feas, areas, delta_areas, lengths, delta_lengths])  # added in area and delta area.
+                    [hu_feas, delta_hu_feas, areas, delta_areas, lengths,
+                     delta_lengths])  # added in area and delta area.
             else:
                 hu_feas = np.hstack([hu_feas, areas, lengths])
             hu_feas = (hu_feas - self.hu_feas_mu) / (self.hu_feas_stds + 1e-9)

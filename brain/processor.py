@@ -54,21 +54,23 @@ from keras.optimizers import Adam
 from keras.utils import to_categorical
 from imageio import imread
 import warnings
+
 warnings.filterwarnings("ignore")
 
 # 能够重现结果
 np.random.seed(0)
 random.seed(0)
 
+
 def get_crop_shape(target, refer):
-    # Width, the 3rd dimension
+    # 宽度，第三维
     cw = (target.get_shape()[2] - refer.get_shape()[2]).value
     assert (cw >= 0)
     if cw % 2 != 0:
         cw1, cw2 = int(cw / 2), int(cw / 2) + 1
     else:
         cw1, cw2 = int(cw / 2), int(cw / 2)
-    # Height, the 2nd dimension
+    # 高度，第二维
     ch = (target.get_shape()[1] - refer.get_shape()[1]).value
     assert (ch >= 0)
     if ch % 2 != 0:
@@ -250,19 +252,20 @@ class ImageProcessor(threading.Thread):
         # 使用设置的YUV阈值获取二进制掩码
         mask_img = self._yuv_clip_image(img_idx)
         mask_img = remove_small_objects(
-                   fill_border(mask_img, 10, fillval=False),
-                   min_size=1024
-                   )
+            fill_border(mask_img, 10, fillval=False),
+            min_size=1024
+        )
         mask_img_cleaned_copy = mask_img.copy()
         mask_img = erosion(binary_fill_holes(mask_img), disk(7))
         obj_only_mask = np.logical_and(mask_img, np.logical_not(mask_img_cleaned_copy))
 
-        # Order the panels in the mask, count the number of panels found in the mask
+        # 排序遮罩中的面板，计算遮罩中找到的面板数
         ordered_mask_img, n_panels = measurements.label(mask_img)
-        # Returns region properties of each panel in a list
+        # 返回列表中每个面板的区域属性
         rprops = regionprops(ordered_mask_img, coordinates='xy')
-        # Remove items which are unlikely to be real panels
-        rprops = [x for x in rprops if x.area > self.all_imgs_list[0].shape[0]*self.all_imgs_list[0].shape[1]/self.exp.panel_n/6]
+        # 移除不太可能是真实面板的项目
+        rprops = [x for x in rprops if
+                  x.area > self.all_imgs_list[0].shape[0] * self.all_imgs_list[0].shape[1] / self.exp.panel_n / 6]
 
         def get_mask_objects(idx, rp):
             tmp_mask = np.zeros(mask_img.shape)
@@ -277,16 +280,16 @@ class ImageProcessor(threading.Thread):
         rprops = [[item[0], item[1][0], item[1][1], item[1][2]] for idx, item in enumerate(rprops)]
         rprops = sorted(rprops, key=itemgetter(1), reverse=True)
 
-        # Check the panel has seeds in it
+        # 检查面板是否有种子
         panels = [(rp, rp.centroid[0], rp.centroid[1], tmp, both) for rp, _, tmp, both in rprops[:self.exp.panel_n]]
 
-        # Sort panels based on y first, then x
+        # 先按y排序，然后按x排序
         panels = sorted(panels, key=itemgetter(1))
         panels = chunks(panels, chunk_no)
         panels = [sorted(p, key=itemgetter(2), reverse=chunk_reverse) for p in panels]
         panels = list(chain(*panels))
 
-        # Set mask, where 1 is top left, 2 is top right, 3 is middle left, etc
+        # 设置掩码，其中1为左上角，2为右上角，3为左中角，依此类推
         panel_list = []
         tmp_list = []
         both_list = []
@@ -351,7 +354,7 @@ class ImageProcessor(threading.Thread):
             new_weights = gmm.weights_ + alpha * (obs - gmm.weights_)
             new_mean = gmm.means_[m] + (alpha / gmm.means_[m]) * delta_m
             new_std = gmm.covariances_[m] + (alpha / gmm.means_[m]) * (
-                delta_m.T * delta_m - np.power(gmm.covariances_[m], 2))
+                    delta_m.T * delta_m - np.power(gmm.covariances_[m], 2))
             gmm.weights_ = new_weights
             gmm.means_[m] = new_mean
             gmm.covariances_[m] = new_std
@@ -383,7 +386,7 @@ class ImageProcessor(threading.Thread):
         bg_mask3 = np.dstack([np.logical_and(curr_mask, self.panels_mask)] * 3)
         bg_rgb_pixels = curr_img * bg_mask3
 
-        # Get all of the bg pixels
+        # 获取所有bg像素
         bg_rgb_pixels = flatten_img(bg_rgb_pixels)
         bg_rgb_pixels = bg_rgb_pixels[bg_rgb_pixels.all(axis=1), :]
         bg_retain = int(bg_rgb_pixels.shape[0] * 0.1)
@@ -425,7 +428,7 @@ class ImageProcessor(threading.Thread):
             img = self.all_imgs_list[idx] / 255.
 
             img_masks = []
-            # Generate the predicted mask for each panel and add them to the mask list.
+            # 为每个面板生成预测的遮罩，并将它们添加到遮罩列表中。
             for p in self.panel_list:
                 panel_img = p.get_cropped_image(img)
                 pp_predicted = NCD(panel_img, new_E, blue_s, b) > TCD
@@ -512,8 +515,10 @@ class ImageProcessor(threading.Thread):
             # and append to a list of all RGB values at foreground locations as well as a list of all RGB values
             # at background locations
             for idx, (mask, curr_img) in enumerate(zip(train_masks, train_images)):
-                bg_mask3 = np.dstack([np.logical_and(mask, self.panels_mask[p.bbox[0]:p.bbox[2], p.bbox[1]:p.bbox[3]])] * 3)
-                fg_mask3 = np.dstack([np.logical_and(np.logical_not(mask), self.panels_mask[p.bbox[0]:p.bbox[2], p.bbox[1]:p.bbox[3]])] * 3)
+                bg_mask3 = np.dstack(
+                    [np.logical_and(mask, self.panels_mask[p.bbox[0]:p.bbox[2], p.bbox[1]:p.bbox[3]])] * 3)
+                fg_mask3 = np.dstack([np.logical_and(np.logical_not(mask),
+                                                     self.panels_mask[p.bbox[0]:p.bbox[2], p.bbox[1]:p.bbox[3]])] * 3)
 
                 bg_rgb_pixels = self._create_transformed_data(
                     curr_img * bg_mask3)
@@ -646,8 +651,6 @@ class ImageProcessor(threading.Thread):
 
         self.app.status_string.set("Removing background %d %%" % int(
             float(idx) / (float(self.exp.end_img - self.exp.start_img)) * 100))
-
-
 
     def _train_clf(self, clf_in, ensemble_clf_f, X, y):
         # Split X and Y into train/test to get an estimate of classification accuracy
@@ -1121,7 +1124,7 @@ class ImageProcessor(threading.Thread):
 
         for idx in range(cum_germ_data.shape[1]):
             ax1.plot(
-                range(self.exp.start_img, n_frames+self.exp.start_img),
+                range(self.exp.start_img, n_frames + self.exp.start_img),
                 cum_germ_data.iloc[:, idx] / float(p_totals[idx]), label="Genotype" + str(idx + 1)
             )
         ax1.set_xlim([self.exp.start_img, self.exp.start_img + n_frames])
@@ -1268,7 +1271,7 @@ class ImageProcessor(threading.Thread):
         img_f = self.all_imgs_list[self.exp.start_img]
         f_masks = np.load(self.exp_masks_dir_frame % (self.exp.start_img), allow_pickle=True)
 
-        img_l = self.all_imgs_list[self.exp.end_img-1]
+        img_l = self.all_imgs_list[self.exp.end_img - 1]
         l_masks = np.load(self.exp_masks_dir_frame % ((self.exp.end_img - self.exp.start_img) - 1), allow_pickle=True)
 
         all_panel_data = []
@@ -1442,7 +1445,8 @@ class ImageProcessor(threading.Thread):
             try:
                 self._save_init_image(self.imgs[self.exp.start_img])
 
-                self._extract_panels(self.imgs[self.exp.start_img], self.core.chunk_no, self.core.chunk_reverse, self.exp.start_img)
+                self._extract_panels(self.imgs[self.exp.start_img], self.core.chunk_no, self.core.chunk_reverse,
+                                     self.exp.start_img)
 
                 self.app.status_string.set("Saving contour image")
 

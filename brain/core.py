@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" core.py - Runs a thread for performing heavy processing along side the GUI.
+""" core.py - 运行一个线程，以便沿着GUI执行繁重的处理。
 
 控制用于发芽实验的图像处理线程的启动。
 进一步用于执行任何繁重的处理，以便在用户与应用程序交互时GUI线程不会挂起。
@@ -42,9 +42,7 @@ class Core(threading.Thread):
             print(obj.seed)
 
     def run(self):
-        """ Not a particularly good way of blocking... But keep the thread
-        alive.        
-        """
+        """ 不是一个特别好的阻止方式。。。但要保持线的活力。"""
         while self.running:
             time.sleep(0.5)
 
