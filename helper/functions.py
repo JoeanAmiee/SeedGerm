@@ -42,13 +42,14 @@ def check_files_have_date(f_name):
 
 
 def get_images_from_dir(path):
+    """获取图像"""
     file_list = os.listdir(path)
     file_list = [el for el in file_list if not el.startswith(".")]
 
     jpg_files, png_files = [], []
     re_1, re_2 = False, False
 
-    for _file in file_list:
+    for _file in file_list:  # 根据后缀分类图像
         if _file.endswith(".jpg"):
             jpg_files.append(_file)
         elif _file.endswith(".png"):
@@ -56,7 +57,7 @@ def get_images_from_dir(path):
         else:
             pass
 
-        if re.findall('ID-(\d+)', _file):
+        if re.findall('ID-(\d+)', _file):  # 匹配图像名称信息
             re_1 = True
         elif re.findall('_(\d+)\.', _file):
             re_2 = True
@@ -82,7 +83,7 @@ def get_images_from_dir(path):
             file_list = sorted(file_list, key=lambda s: int(re.findall('_(\d+)\.', s)[0]))
     except:
         # print("Could not perform regexp on files.")
-        print("文件名无法匹配")
+        print("图像文件自动排序失败")
         return []
 
     return file_list
@@ -354,13 +355,14 @@ def hours_between(start, end, round_minutes=False):
 
 
 def in_range(img, low, high):
+    """功能不明"""
     img = img.astype('f')
 
     y = img[:, :, 0]
     u = img[:, :, 1]
     v = img[:, :, 2]
 
-    mask = np.logical_and(low[0] <= y, y <= high[0])
+    mask = np.logical_and(low[0] <= y, y <= high[0])  # 逻辑与
     mask = np.logical_and(mask, low[1] <= u)
     mask = np.logical_and(mask, u <= high[1])
     mask = np.logical_and(mask, low[2] <= v)
@@ -369,21 +371,24 @@ def in_range(img, low, high):
 
 
 def rgb2ycrcb(img):
+    """RGB图像转换成YCrCb色彩空间，即YUV色彩空间"""
     img = img.astype(np.float)
     r = img[:, :, 0]
     g = img[:, :, 1]
     b = img[:, :, 2]
 
-    Y = (r * 0.299) + (g * 0.587) + (b * 0.114)
+    Y = (r * 0.299) + (g * 0.587) + (b * 0.114)  # 转换公式
 
     cr = ((r - Y) * 0.713) + 128.
     cb = ((b - Y) * 0.564) + 128.
 
+    # round() 方法返回浮点数x的四舍五入值，numpy.dstack 沿着深度折叠数组
     return np.round(np.dstack([Y, cr, cb])).astype(np.uint8)
 
 
 def slugify(value):
     """
+    去除非法字符
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
     Remove characters that aren't alphanumerics, underscores, or hyphens.
     Convert to lowercase. Also strip leading and trailing whitespace.

@@ -156,9 +156,9 @@ class Application(Tkinter.Tk):
         # 定义并构建右键单击的菜单
         self.table_menu = Tkinter.Menu(self, tearoff=0)
         table_menu_config = [
-            ('command', '设置YUV阈值', self._set_yuv_ranges),
+            ('command', '设置YUV范围', self._set_yuv_ranges),
             ('separator', None, None),
-            ('command', '设置YUV面板阈值', self._set_yuv_panel_ranges),
+            ('command', '设置面板YUV范围（可选）', self._set_yuv_panel_ranges),
             ('separator', None, None),
             ('command', '处理图像', self._process_images),
             ('separator', None, None),
@@ -199,6 +199,7 @@ class Application(Tkinter.Tk):
         self.after(100, self._refresh_exp)
 
     def _populate_experiment_table(self):
+        """显示实验数据"""
         self.treeview.delete(*self.treeview.get_children())
 
         if not self.experiments:
@@ -211,15 +212,15 @@ class Application(Tkinter.Tk):
             if not os.path.exists(exp.img_path):
                 print("找不到图像文件夹", exp.img_path)
                 messagebox.showwarning("Experiment problem",
-                                       "找不到实验{}的图像文件夹目录{}".format(exp.name, exp.img_path))
-                exp.status = "错误"
+                                       "找不到实验 {} 的图像文件夹目录 {}".format(exp.name, exp.img_path))
+                exp.status = "异常"
             else:
                 imgs = get_images_from_dir(exp.img_path)
-                n_imgs = len(imgs)
+                n_imgs = len(imgs)  # 显示图像文件夹目录文件数
                 if not n_imgs:
                     messagebox.showwarning("Experiment problem",
-                                           "Problem with images for experiment {}.".format(exp.name))
-                    exp.status = "错误"
+                                           "实验 {} 的图像文件夹为空".format(exp.name))
+                    exp.status = "异常"
 
             values = [
                 exp.name,
@@ -232,6 +233,7 @@ class Application(Tkinter.Tk):
             self.exp_treeview_ids[exp.eid] = e_item
 
     def _menu_commands(self, menu_obj, commands):
+        """右键菜单选项"""
         for t, l, fn in commands:
             if t == "command":
                 menu_obj.add_command(label=l, command=fn)
@@ -247,7 +249,7 @@ class Application(Tkinter.Tk):
             new_menu_obj = Tkinter.Menu(menu, tearoff=0)
             self.__dict__[menu_item_key] = new_menu_obj
 
-            # Add a cascade with key as the label.
+            # 添加以键为标签的级联。
             menu.add_cascade(label=key, menu=new_menu_obj)
             self._menu_commands(new_menu_obj, value)
 
@@ -268,6 +270,7 @@ class Application(Tkinter.Tk):
         self.core = core
 
     def _get_exp(self):
+        """获取实验信息"""
         item = self.treeview.selection()
         index = self.treeview.index(item)
         return self.experiments[index]
@@ -278,27 +281,29 @@ class Application(Tkinter.Tk):
         return index
 
     def _set_yuv_ranges(self):
+        """设置YUV范围"""
         exp = self._get_exp()
         self.yuv_ranges = YUVRanges(self, exp)
 
     def _set_yuv_panel_ranges(self):
+        """设置面板YUV范围（必须先设置YUV范围）"""
         exp = self._get_exp()
         self.yuv_panel_ranges = YUVPanelRanges(self, exp)
 
     def _process_images(self):
-        print("Preparing to process image series")
+        print("准备处理图像序列")
         exp = self._get_exp()
-        # 如果用户没有为这个实验设置YUV阈值，我们就不能处理这个实验
+        # 如果用户没有为这个实验设置YUV范围，我们就不能处理这个实验
         if not exp.yuv_ranges_set:
             messagebox.showwarning(
                 "",
-                "YUV ranges have not been set for this experiment."
+                "这个实验还没有设置YUV范围。"
             )
             return
 
         self.info_label.config(background=self.GREEN)
 
-        exp.status = "运行中"
+        exp.status = "分析中"
         self.core.start_processor(exp)
 
     def _save_results(self):
@@ -431,7 +436,7 @@ class Application(Tkinter.Tk):
             shutil.rmtree(exp.exp_path)
 
             # self.db.remove(eids=[exp.eid])
-            self.db.remove(self.query.name == exp.name)
+            self.db.remove(self.query._eid == exp.eid)
             Experiment.updated = True
             self._experiments.remove(exp)
             self._populate_experiment_table()
@@ -443,7 +448,7 @@ class Application(Tkinter.Tk):
         self.panel_tool = PanelTool()
 
     def _documentation(self):
-        print("Read documentation at https://github.com/Crop-Phenomics-Group/SeedGerm/blob/master/README.txt")
+        print("浏览器打开：https://github.com/Crop-Phenomics-Group/SeedGerm/blob/master/README.txt")
 
     def _about(self):
         self.about_window = AboutWindow(self)

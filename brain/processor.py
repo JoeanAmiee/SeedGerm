@@ -191,9 +191,12 @@ class ImageProcessor(threading.Thread):
             self.spp_processor = copy.deepcopy(self.core.species_classes[
                                                    self.exp.species])
         except KeyError:
-            print("No species module found for %s" % (self.exp.species))
-            print("ought to use default, shouldn't occur as populate species list from these modules")
-            print("consider adding parameters to the config if you're confident")
+            # print("No species module found for %s" % (self.exp.species))
+            # print("ought to use default, shouldn't occur as populate species list from these modules")
+            # print("consider adding parameters to the config if you're confident")
+            print("无效的 %s 品种参数" % (self.exp.species))
+            print("应该选择已有的品种，不应该使用品种列表以外的品种")
+            print("如果您有信心，可以考虑在配置中添加新的品种参数")
 
     def _run_check(self):
         if not self.running:
@@ -211,14 +214,14 @@ class ImageProcessor(threading.Thread):
         plt.close(fig)
 
     def _yuv_clip_image(self, img_f):
-        # 使用手动设置的阈值返回图像的二进制掩码
+        # 使用手动设置的范围返回图像的二进制遮罩
         img = self.all_imgs_list[img_f]
         img_yuv = rgb2ycrcb(img)
         mask_img = in_range(img_yuv, self.yuv_low, self.yuv_high)
         return mask_img.astype(np.bool)
 
     def _yuv_clip_panel_image(self, img_f, p):
-        # 使用单个面板阈值返回面板图像的二进制掩码
+        # 使用单个面板范围返回面板图像的二进制遮罩
         img = self.all_imgs_list[img_f]
         img_yuv = rgb2ycrcb(img)
         self.yuv_panel_json_file = os.path.join(
@@ -247,9 +250,9 @@ class ImageProcessor(threading.Thread):
                     self.panel_list = pickle.load(fh)
                     return
                 except EOFError:
-                    print("pickle is broken")
+                    print("序列化数据已损坏")
 
-        # 使用设置的YUV阈值获取二进制掩码
+        # 使用设置的YUV范围获取二进制遮罩
         mask_img = self._yuv_clip_image(img_idx)
         mask_img = remove_small_objects(
             fill_border(mask_img, 10, fillval=False),
@@ -289,7 +292,7 @@ class ImageProcessor(threading.Thread):
         panels = [sorted(p, key=itemgetter(2), reverse=chunk_reverse) for p in panels]
         panels = list(chain(*panels))
 
-        # 设置掩码，其中1为左上角，2为右上角，3为左中角，依此类推
+        # 设置遮罩，其中1为左上角，2为右上角，3为左中角，依此类推
         panel_list = []
         tmp_list = []
         both_list = []
@@ -462,37 +465,37 @@ class ImageProcessor(threading.Thread):
         return y_pred
 
     def _train_clfs(self, clf_in):
-        print("Classifier: ", self.exp.bg_remover)
+        print("分类器：", self.exp.bg_remover)
         self.classifiers = []
-        # For each panel in the list of panels, create training data then train the defined classifier
+        # 对于面板列表中的每个面板，创建训练数据，然后训练定义的分类器
         for p in self.panel_list:
-            print("Training classifier for panel {}".format(p.label))
+            print("第 {} 个面板分类器开始训练".format(p.label))
 
-            # Attempt to load classifiers if they already exist
+            # 如果分类器已经存在，尝试加载它们
             ensemble_clf_f = pj(self.exp_gzdata_dir, "ensemble_clf_{}.pkl".format(p.label))
             if os.path.exists(ensemble_clf_f):
                 with open(ensemble_clf_f, 'rb') as fh:
                     self.classifiers = pickle.load(fh)
 
             if len(self.classifiers) == len(self.panel_list):
-                print('Loaded previous classifiers successfully')
+                print('已成功加载已有的分类器')
                 return
 
-            # 4 x 4 figure defined, each subplot will show one training mask
+            # 4 x 4图定义，每个子图将显示一个训练遮罩
             fig, axarr = plt.subplots(4, 4)
-            fig.suptitle('Training images for panel {}'.format(p.label))
+            fig.suptitle('第 {}  个面板的图像训练'.format(p.label))
             axarr = list(chain(*axarr))
 
             train_masks = []
             train_images = []
 
-            # 16 training images selected as first 10 IDs, middle ID and last 5 IDs
+            # 选择16个训练图像作为前10个ID、中间ID和最后5个ID
             train_img_ids = list(range(self.exp.start_img, self.exp.start_img + 10))
             train_img_ids += [int((self.exp.end_img + self.exp.start_img) / 2) - 1, self.exp.end_img - 2,
                               self.exp.end_img - 1, self.exp.end_img - 3, self.exp.end_img - 4, self.exp.end_img - 5]
 
-            # For each training image, training mask labels created using the yuv thresholds chosen at experiment setup,
-            # training mask labels plotted in 4 x 4 figure
+            # 对于每个训练图像，使用在实验设置中选择的yuv阈值创建训练遮罩标签
+            # 在4 x 4图中绘制的训练遮罩标签
             for idx, img_i in enumerate(train_img_ids):
                 curr_img = self.all_imgs_list[img_i][p.bbox[0]:p.bbox[2], p.bbox[1]:p.bbox[3]] / 255.
                 train_images.append(curr_img)
@@ -504,16 +507,14 @@ class ImageProcessor(threading.Thread):
                 axarr[idx].imshow(curr_mask)
                 axarr[idx].axis('off')
 
-            # Figure showing 16 training images for this panel saved in images directory
+            # 此图显示了保存在images目录中的此面板的16个训练图像
             fig.savefig(pj(self.exp_images_dir, "train_imgs_panel_{}.jpg".format(p.label)))
             plt.close(fig)
 
             all_bg_pixels = []
             all_fg_pixels = []
 
-            # For each training mask, get corresponding RGB values for background and foreground pixels,
-            # and append to a list of all RGB values at foreground locations as well as a list of all RGB values
-            # at background locations
+            # 对于每个训练遮罩，获取背景和前景像素的相应RGB值，并附加到前景位置的所有RGB值列表以及背景位置的所有RGB值列表
             for idx, (mask, curr_img) in enumerate(zip(train_masks, train_images)):
                 bg_mask3 = np.dstack(
                     [np.logical_and(mask, self.panels_mask[p.bbox[0]:p.bbox[2], p.bbox[1]:p.bbox[3]])] * 3)
@@ -531,15 +532,14 @@ class ImageProcessor(threading.Thread):
             bg_rgb_pixels = np.vstack(all_bg_pixels)
             fg_rgb_pixels = np.vstack(all_fg_pixels)
 
-            # Concatenate training data from all images, X contains RGB values corresponding to Y label values (0 being
-            # background, 1 being foreground)
+            # 连接来自所有图像的训练数据，X包含对应于Y标签值的RGB值（0为背景，1为前景）
             X = np.vstack([bg_rgb_pixels, fg_rgb_pixels])
             y = np.concatenate([
                 np.zeros(bg_rgb_pixels.shape[0]),
                 np.ones(fg_rgb_pixels.shape[0])
             ])
 
-            # Train the classifier on this panel's training data
+            # 在此面板的训练数据上训练分类器
             self._train_clf(clf_in, ensemble_clf_f, X, y)
 
     def _train_unet(self):
@@ -655,19 +655,19 @@ class ImageProcessor(threading.Thread):
     def _train_clf(self, clf_in, ensemble_clf_f, X, y):
         # Split X and Y into train/test to get an estimate of classification accuracy
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-        print("Shape of entire dataset: ", X.shape, y.shape)
-        print("Shape of training dataset: ", X_train.shape, y_train.shape)
-        print("Shape of testing dataset: ", X_test.shape, y_test.shape)
+        print("完整数据集的形状：", X.shape, y.shape)
+        print("训练数据集的形状：", X_train.shape, y_train.shape)
+        print("测试数据集的形状：", X_test.shape, y_test.shape)
 
-        # Fit classifier on training data, print train and test accuracy scores
+        # 在训练数据上拟合分类器，打印训练和测试精度分数
         for clf_n, clf in clf_in:
             clf.fit(X_train, y_train)
-            print(clf_n, " train score: ", clf.score(X_train, y_train))
-            print(clf_n, " test score: ", clf.score(X_test, y_test))
-        # Append trained classifier to list of classifiers
+            print(clf_n, "训练得分", clf.score(X_train, y_train))
+            print(clf_n, "检验得分：", clf.score(X_test, y_test))
+        # 将训练好的分类器附加到分类器列表中
         self.classifiers.append(clf)
 
-        # Save trained classifier
+        # 保存训练分类器
         with open(ensemble_clf_f, "wb") as fh:
             pickle.dump(clf_in, fh)
 
@@ -697,16 +697,15 @@ class ImageProcessor(threading.Thread):
         return rgb_pixels
 
     def _remove_background(self):
-        print("Removing background...")
+        print("正在移除背景")
 
-        # If number of masks in masks directory is greater than number of images to be analysed, skip background removal
-        # step as masks already exist
+        # 如果遮罩目录中的遮罩数大于要分析的图像数，请跳过背景删除步骤，因为遮罩已经存在
         if len(os.listdir(self.exp_masks_dir)) >= (self.exp.end_img - self.exp.start_img):
             return
 
         self.all_masks = []
 
-        # Predict the background and foreground pixels in each image
+        # 预测每个图像中的背景和前景像素
         for idx in tqdm(range(self.exp.start_img, self.exp.end_img)):
             img_masks = []
             # Try to load predicted background/foreground mask for this image ID if it exists
@@ -732,7 +731,7 @@ class ImageProcessor(threading.Thread):
                     np.save(fh, img_masks)
 
             # Append list of masks for this image to a list that will contain masks for all images
-            self.app.status_string.set("Removing background %d %%" % int(
+            self.app.status_string.set("正在移除背景 %d %%" % int(
                 float(idx) / (float(self.exp.end_img - self.exp.start_img)) * 100))
             self.all_masks.append(img_masks)
 
@@ -744,7 +743,7 @@ class ImageProcessor(threading.Thread):
                     self.panel_l_rprops = pickle.load(fh)
                     return
                 except EOFError:
-                    print("pickle error")
+                    print("读取序列化数据失败")
 
         fig, axarr = plt.subplots(self.exp.panel_n, 1, figsize=(16, 16 * self.exp.panel_n))
         try:
@@ -917,8 +916,8 @@ class ImageProcessor(threading.Thread):
                 all_seed_rprops = new_order
                 labelled_array = new_mask
 
-                # We add an array of labels and the region properties for each panel.
-                print("Number of seeds identified in panel {}: ".format(panel.label) + str(len(all_seed_rprops)))
+                # 我们为每个面板添加一组标签和区域属性。
+                print("面板 {} 中标识的种子数：".format(panel.label) + str(len(all_seed_rprops)))
                 self.panel_l_rprops_1.append((labelled_array, all_seed_rprops))
                 if self.exp.panel_n > 1:
                     axarr[ipx].imshow(mask_med)
@@ -979,13 +978,11 @@ class ImageProcessor(threading.Thread):
         return
 
     def _perform_classification(self):
-        """ Also need to quantify whether the seed merges, and whether it has 
-        moved.
-        """
-        print("Classifying seeds")
+        """ 还需要量化种子是否合并，以及是否移动。"""
+        print("种子分类")
 
         if len(glob.glob(pj(self.exp_results_dir, "germ_panel_*.json"))) >= self.exp.panel_n:
-            print("Already analysed data")
+            print("数据已经分析")
             return
 
         if self.all_masks is None:
@@ -994,13 +991,13 @@ class ImageProcessor(threading.Thread):
                 data = np.load(self.exp_masks_dir_frame % (i), allow_pickle=True)
                 self.all_masks.append(data)
 
-        # Evaluate each panel separately so that variance between genotypes doesn't worsen results
+        # 分别评估每个面板，这样基因型之间的差异不会恶化结果
         for panel_idx, panel_object in enumerate(tqdm(self.panel_list)):
             try:
                 # This is the tuple of the labelled arrays generated from regionprops
                 panel_labels, panel_regionprops = self.panel_l_rprops[panel_idx]
                 p_masks = []
-                # Extract all the masks for the specific panel, for every image
+                # 为每个图像提取特定面板的所有遮罩
                 for i in range(len(self.all_masks)):
                     p_masks.append(self.all_masks[i][panel_idx])
 
@@ -1026,8 +1023,9 @@ class ImageProcessor(threading.Thread):
 
 
             except Exception as e:
-                print("Could not run panel %d" % (panel_idx))
+                print("无法运行面板 %d" % (panel_idx))
                 print(e)
+                exit()
                 traceback.print_exc()
 
     def _get_cumulative_germ(self, germ, win=5):
@@ -1047,7 +1045,7 @@ class ImageProcessor(threading.Thread):
     def _analyse_results(self, proprtions):
         all_germ = []
         for i in range(self.exp.panel_n):
-            # If the with fails to open, we should not perform operations on germ_d.
+            # 如果with不能打开，我们不应该对细菌进行操作。
             with open(pj(self.exp_results_dir, "germ_panel_%d.json" % (i))) as fh:
                 germ_d = json.load(fh)
 
@@ -1114,7 +1112,7 @@ class ImageProcessor(threading.Thread):
 
         plt.figtext(0.05, 0.93, p_t_text)
 
-        # Only use date information if it is contained in the filename
+        # 仅当文件名中包含日期信息时才使用
         has_date = check_files_have_date(self.imgs[0])
         start_dt = None
         if has_date:
@@ -1176,7 +1174,7 @@ class ImageProcessor(threading.Thread):
                               loc='center')
 
         tbl_props = the_table.properties()
-        tbl_cells = tbl_props['child_artists']
+        tbl_cells = tbl_props['children']
         for cell in tbl_cells:
             cell.set_height(0.1)
         ax2.set_title("Percentage T values")
@@ -1436,70 +1434,71 @@ class ImageProcessor(threading.Thread):
             json.dump(panel_seed_idxs, fh)
 
     def run(self):
-        print("Processor started")
+        print("开始分析")
 
         if self.running:
 
             start = time.time()
 
             try:
-                self._save_init_image(self.imgs[self.exp.start_img])
+                self._save_init_image(self.imgs[self.exp.start_img])  # 保存初始图象
 
                 self._extract_panels(self.imgs[self.exp.start_img], self.core.chunk_no, self.core.chunk_reverse,
-                                     self.exp.start_img)
+                                     self.exp.start_img)  # 提取面板
 
-                self.app.status_string.set("Saving contour image")
+                self.app.status_string.set("保存轮廓图像")
 
                 self._save_contour_image()
 
-                self.app.status_string.set("Training background removal clfs")
+                # self.app.status_string.set("Training background removal clfs")
+                self.app.status_string.set("训练移除种子背景")
 
-                # Seed segmentation performed by the classifier defined in experiment setup
+                # 用实验装置中定义的分类器进行种子分割
                 if self.exp.bg_remover == 'UNet':
-                    self.app.status_string.set("Removing background")
+                    self.app.status_string.set("正在移除背景")
                     self._train_unet()
                 elif self.exp.bg_remover == "SGD":
-                    # Define stochastic gradient descent classifier's hyperparameters
+                    # 定义随机梯度下降分类器的超参数
                     self._train_clfs([("SGD", SGDClassifier(max_iter=50, random_state=0, tol=1e-5))])
-                    self.app.status_string.set("Removing background")
+                    self.app.status_string.set("正在移除背景")
                     self._remove_background()
                 elif self.exp.bg_remover == "GMM":
                     self._train_gmm_clfs()
-                    self.app.status_string.set("Removing background")
+                    self.app.status_string.set("正在移除背景")
                     self._gmm_remove_background()
                 else:
-                    print(".... unknown BG classifier")
+                    print("未定义的背景分类器")
 
-                self.app.status_string.set("Labelling seeds")
+                self.app.status_string.set("标记种子")
                 self._label_seeds()
 
-                self.app.status_string.set("Generating statistics")
+                self.app.status_string.set("生成统计信息")
                 self._generate_statistics()
 
-                self.app.status_string.set("Performing classification")
+                self.app.status_string.set("正在执行分类")
                 self._perform_classification()
 
-                self.app.status_string.set("Analysing results")
+                self.app.status_string.set("正在分析结果")
 
                 self._analyse_results(self.core.proportions)
 
-                self.app.status_string.set("Quantifying initial seed data")
+                self.app.status_string.set("量化初始种子数据")
                 self._quantify_first_frame(self.core.proportions)
 
-                self.app.status_string.set("Finished processing")
-                self.exp.status = "Finished"
+                self.app.status_string.set("已完成分析")
+                self.exp.status = "完成"
 
-                print("End values: ", self.end_idx + self.exp.start_img)
+                print("结束值：", self.end_idx + self.exp.start_img)
 
                 print(time.time() - start)
 
-                print("Finished")
+                print("完成")
 
             except Exception as e:
                 raise e
-                self.exp.status = "Error"
-                self.app.status_string.set("Error whilst processing")
-                print("Exception args: " + str(e.args))
+                self.exp.status = "异常"
+                self.app.status_string.set("处理时发生异常")
+                print("异常参数：" + str(e.args))
 
             self.running = False
 

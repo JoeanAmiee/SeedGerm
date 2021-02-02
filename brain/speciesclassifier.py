@@ -46,7 +46,7 @@ class SpeciesClassifier:
         ])
 
     def _build_classifiers(self):
-        # Train on first 20% of images and create empty lists of features
+        # 训练前20%的图像并创建特征的空列表
         to_analyse = int(len(self.all_imgs) * 0.2)
         hu_feas = []
         areas = []
@@ -179,7 +179,8 @@ class SpeciesClassifier:
         hu_feas = (hu_feas - self.hu_feas_mu) / (self.hu_feas_stds + 1e-9)
 
         # Train a one class SVM on the hu features
-        self.clf_hu = svm.OneClassSVM(nu=0.03, kernel="rbf", gamma=0.001, random_state=0)
+        # self.clf_hu = svm.OneClassSVM(nu=0.03, kernel="rbf", gamma=0.001, random_state=0)
+        self.clf_hu = svm.OneClassSVM(nu=0.03, kernel="rbf", gamma=0.001)
         self.clf_hu.fit(hu_feas)
 
         # If using colour, normalise the colour histograms i.e. z = (x-mu)/sigma
@@ -289,7 +290,7 @@ class SpeciesClassifier:
         seed_classification = {}
         cols = []
 
-        # For all the found seeds of the input panel.
+        # 对于所有找到的输入面板种子。
         for index, rp in enumerate(self.panel_regionprops):
             cols.append(rp.label)
             seed_masks, _ = self._get_seed_mask_set(rp)
@@ -321,9 +322,9 @@ class SpeciesClassifier:
                 lengths_total.append([m_rp.minor_axis_length, m_rp.major_axis_length,
                                       float(m_rp.minor_axis_length + 1.0) / float(m_rp.major_axis_length + 1.0)])
 
-            # For each seed in all the images.
+            # 对于所有图像中的每个种子。
             for idx, m in enumerate(seed_masks):
-                # Extract image region.
+                # 提取图像区域。
                 m = m.astype('i')
 
                 m_rp = regionprops(m, coordinates="xy")
@@ -354,10 +355,10 @@ class SpeciesClassifier:
                 print("Error with current seed,", rp.label)
                 continue
 
-            # trying to use the cummean of the areas. ie its rate of growth over time.
+            # 试着用平均面积。它随时间的增长速度。
             hu_feas = np.vstack(hu_feas)
 
-            # TEST:!!!! see if we can detect the change point.
+            # 测试：！！！！看看能不能检测到变化点。
             '''from helper.change_point_analysis import CPA_PoissonMean, CPA_Mean, CPA_Variance, CPA_BernoulliMean
 
             cpas = [CPA_Mean(),CPA_Variance(),CPA_BernoulliMean(),CPA_PoissonMean()]

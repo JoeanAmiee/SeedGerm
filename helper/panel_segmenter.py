@@ -24,6 +24,7 @@ def extend_green(img):
 
 
 def fill_border(img, N, fillval=1.):
+    """功能不明"""
     img_copy = img.copy()
     img_copy[:N, :] = fillval
     img_copy[-N:, :] = fillval
@@ -55,7 +56,7 @@ def segment_panel(img):
 
     l, n = label(img_g)
 
-    # get regions that are panels based on size of area
+    # 获取基于区域大小的面板区域
     panels = []
     for rp in regionprops(l):  # , coordinates="xy"):
         if rp.area > 250000:

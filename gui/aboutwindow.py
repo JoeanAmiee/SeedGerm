@@ -4,7 +4,7 @@ import tkinter as Tkinter
 import sys
 
 about_text = """
-SeedGerm - Beta release（翻译：游永全）
+SeedGerm - Beta release（优化、翻译：游永全）
 
 隶属: Crop Phenomics Group, Earlham Institute, Norwich Research Park, UK
 
@@ -13,18 +13,21 @@ SeedGerm - Beta release（翻译：游永全）
 
 
 class AboutWindow(Tkinter.Toplevel):
+    """
+    关于窗口
+    """
 
     def __init__(self, exp):
         Tkinter.Toplevel.__init__(self)
-        self.title("关于 SeedGerm")
-        self.resizable(width=False, height=False)
-        self.wm_geometry("420x250")
-        self.iconbitmap('.\logo.ico')
+        self.title("关于 SeedGerm")  # 标题栏
+        self.resizable(width=False, height=False)  # 不允许更改窗口大小
+        self.wm_geometry("420x250")  # 窗口大小
+        self.iconbitmap('.\logo.ico')  # 窗口图标
 
-        photo = Tkinter.PhotoImage(file=("./icon.gif"))
+        photo = Tkinter.PhotoImage(file="./icon.gif")  # 背景图片
         w = Tkinter.Label(self, image=photo)
         w.photo = photo
-        w.pack()
+        w.pack()  # 类似输出
 
         self.msg = Tkinter.Message(self, text=about_text)
         self.msg.pack()

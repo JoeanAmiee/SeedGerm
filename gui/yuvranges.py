@@ -33,10 +33,12 @@ sns.set_style("white")
 
 
 class YUVRanges(Tkinter.Toplevel):
+    """设置YUV范围"""
+
     def __init__(self, app, exp):
         Tkinter.Toplevel.__init__(self)
 
-        self.maxsize(width=1260, height=720)
+        self.maxsize(width=1280, height=720)
         self.app = app
         self.exp = exp  # type: Experiment
         self.yuv_json_file = os.path.join(
@@ -44,7 +46,7 @@ class YUVRanges(Tkinter.Toplevel):
             "yuv_ranges.json"
         )
 
-        self.title("Set YUV ranges")
+        self.title("设置YUV范围")
         self.resizable(width=False, height=False)
         self.iconbitmap('.\logo.ico')
 
@@ -52,26 +54,20 @@ class YUVRanges(Tkinter.Toplevel):
         end_img = int(self.exp.end_img)
 
         img_path = self.exp.img_path
-        imgs = get_images_from_dir(img_path)
+        imgs = get_images_from_dir(img_path)  # 获取图像
 
         img_01 = imread(os.path.join(img_path, imgs[start_img]))
-        # print(img_01.shape)
-        # img_01 = skimage.img_as_ubyte(rescale(img_01, 0.25))
-        img_01 = skimage.img_as_ubyte(rescale(img_01, [0.25, 0.25, 1]))
-        # print(img_01.shape)
+        img_01 = skimage.img_as_ubyte(rescale(img_01, 0.25))
         """img_as_ubyte：转换图像数据类型，rescale：缩放图片"""
         img_02 = imread(os.path.join(img_path, imgs[start_img + int((end_img - start_img) / 3)]))
-        # img_02 = skimage.img_as_ubyte(rescale(img_02, 0.25))
-        img_02 = skimage.img_as_ubyte(rescale(img_02, [0.25, 0.25, 1]))
+        img_02 = skimage.img_as_ubyte(rescale(img_02, 0.25))
         img_03 = imread(os.path.join(img_path, imgs[start_img + int(2 * (end_img - start_img) / 3)]))
-        # img_03 = skimage.img_as_ubyte(rescale(img_03, 0.25))
-        img_03 = skimage.img_as_ubyte(rescale(img_03, [0.25, 0.25, 1]))
+        img_03 = skimage.img_as_ubyte(rescale(img_03, 0.25))
         img_04 = imread(os.path.join(img_path, imgs[end_img - 1]))
-        # img_04 = skimage.img_as_ubyte(rescale(img_04, 0.25))
-        img_04 = skimage.img_as_ubyte(rescale(img_04, [0.25, 0.25, 1]))
+        img_04 = skimage.img_as_ubyte(rescale(img_04, 0.25))
 
         self.img_01_yuv = rgb2ycrcb(img_01)
-        self.img_01_rgb = img_01.copy() / 255.
+        self.img_01_rgb = img_01.copy() / 255.  # 将图像矩阵转化到0-1之间
         self.img_02_yuv = rgb2ycrcb(img_02)
         self.img_02_rgb = img_02.copy() / 255.
         self.img_03_yuv = rgb2ycrcb(img_03)
@@ -79,7 +75,7 @@ class YUVRanges(Tkinter.Toplevel):
         self.img_04_yuv = rgb2ycrcb(img_04)
         self.img_04_rgb = img_04.copy() / 255.
 
-        self.fig = plt.Figure(figsize=(10, 8))
+        self.fig = plt.Figure(figsize=(9, 7))
         self.ax = self.fig.add_subplot(2, 2, 1)
         self.ax1 = self.fig.add_subplot(2, 2, 2)
         self.ax2 = self.fig.add_subplot(2, 2, 3)
@@ -233,7 +229,7 @@ class YUVRanges(Tkinter.Toplevel):
 
         self.save_button = Tkinter.Button(
             self,
-            text="Save values",
+            text="保存参数",
             command=self._save_values,
         )
 
@@ -251,7 +247,7 @@ class YUVRanges(Tkinter.Toplevel):
         self.v_low.grid(in_=self, column=2, row=8, )
         self.v_high.grid(in_=self, column=2, row=9, )
 
-        self.save_button.grid(in_=self, column=2, row=12, )
+        self.save_button.grid(in_=self, column=2, row=11, )
 
         self.tk_fig_canvas_widget.grid(
             in_=self,
@@ -307,16 +303,17 @@ class YUVRanges(Tkinter.Toplevel):
             self.v_high.set(high[2])
 
     def _save_values(self, event=None):
+        """保存YUV参数"""
         yuv_ranges = {'low': self.yuv_low.tolist(), 'high': self.yuv_high.tolist()}
         yes_overwrite = True
         if os.path.exists(self.yuv_json_file):
             yes_overwrite = messagebox.askyesno(
                 "",
-                "YUV values set, are you sure you want to overwrite?"
+                "YUV参数已经设置，是否覆盖参数"
             )
 
         if yes_overwrite:
-            print("Setting yuv")
+            print("成功设置YUV参数")
             self.exp.yuv_ranges_set = True
             with open(self.yuv_json_file, "w+") as fh:
                 json.dump(yuv_ranges, fh)
@@ -327,7 +324,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
     def __init__(self, app, exp, idx_p=0):
         Tkinter.Toplevel.__init__(self)
 
-        self.maxsize(width=1260, height=720)
+        self.maxsize(width=1280, height=720)
         self.app = app
         self.exp = exp  # type: Experiment
         self.idx_p = idx_p
@@ -336,7 +333,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
             "yuv_ranges.json"
         )
 
-        self.title("Set YUV panel ranges")
+        self.title("设置面板YUV范围")
         self.resizable(width=False, height=False)
         self.iconbitmap('.\logo.ico')
 
@@ -366,6 +363,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
         self.yuv_high = yuv_ranges['high']
 
         def _yuv_clip_image(img):
+            """功能不明"""
             img_yuv = rgb2ycrcb(img)
             mask_img = in_range(img_yuv, self.yuv_low, self.yuv_high)
             return mask_img.astype(np.bool)
@@ -374,18 +372,20 @@ class YUVPanelRanges(Tkinter.Toplevel):
         mask_img = remove_small_objects(
             fill_border(mask_img, 10, fillval=False),
             min_size=1024
-        )
+        )  # 裁剪图像
         mask_img_cleaned_copy = mask_img.copy()
+        """erosion()腐蚀，binary_fill_holes()孔洞填充，disk()圆形形态学操作"""
         mask_img = erosion(binary_fill_holes(mask_img), disk(7))
 
         obj_only_mask = np.logical_and(mask_img, np.logical_not(mask_img_cleaned_copy))
 
-        # get labels
+        # 获取标签，区分背景
         l, n = measurements.label(mask_img)
 
-        rprops = regionprops(l, coordinates='xy')
+        rprops = regionprops(l, coordinates='xy')  # 测量标记图像区域
 
         def get_mask_objects(idx, rp):
+            """获取遮罩对象"""
             tmp_mask = np.zeros(mask_img.shape)
             tmp_mask[l == rp.label] = 1
 
@@ -397,17 +397,17 @@ class YUVPanelRanges(Tkinter.Toplevel):
         rprops = [(rp, get_mask_objects(idx, rp)) for idx, rp in enumerate(rprops)]
         rprops = sorted(rprops, key=itemgetter(1), reverse=True)
 
-        # Check the panel has seeds in it
+        # 检查面板是否有种子
 
         panels = [(rp, rp.centroid[0], rp.centroid[1]) for rp, _ in rprops[:self.exp.panel_n]]
 
-        # sort panels based on y first, then x
+        # 首先根据y对面板进行排序，然后对x进行排序
         panels = sorted(panels, key=itemgetter(1))
         panels = chunks(panels, self.chunk_no)
         panels = [sorted(p, key=itemgetter(2), reverse=self.chunk_reverse) for p in panels]
         panels = list(chain(*panels))
 
-        # set mask, where 1 is top left, 2 is top right, 3 is middle left, etc
+        # 设置掩码，其中1为左上角，2为右上角，3为左中角，依此类推
         panel_list = []  # List[Panel]
         for idx in range(len(panels)):
             rp, _, _ = panels[idx]
@@ -435,7 +435,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
             self.img_04_yuv = rgb2ycrcb(img_04)
             self.img_04_rgb = img_04.copy() / 255.
 
-            self.fig = plt.Figure(figsize=(10, 8))
+            self.fig = plt.Figure(figsize=(9, 7))
             self.ax = self.fig.add_subplot(2, 2, 1)
             self.ax1 = self.fig.add_subplot(2, 2, 2)
             self.ax2 = self.fig.add_subplot(2, 2, 3)
@@ -589,7 +589,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
 
             self.save_button = Tkinter.Button(
                 self,
-                text="Save values",
+                text="保存参数",
                 command=self._save_values_panel,
             )
 
@@ -607,7 +607,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
             self.v_low.grid(in_=self, column=2, row=8, )
             self.v_high.grid(in_=self, column=2, row=9, )
 
-            # self.save_button.grid(in_=self, column=2, row=12, )
+            self.save_button.grid(in_=self, column=2, row=11, )
 
             self.tk_fig_canvas_widget.grid(
                 in_=self,
@@ -681,7 +681,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
         if os.path.exists(new_path):
             yes_overwrite = messagebox.askyesno(
                 "",
-                "YUV values set, are you sure you want to overwrite?"
+                "已设置YUV参数，是否覆盖参数？"
             )
 
         if yes_overwrite:

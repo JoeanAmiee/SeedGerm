@@ -5,7 +5,7 @@ from tinydb import TinyDB
 
 
 class Experiment(object):
-    db_path = './data/experiment_list.json'
+    db_path = './data/experiment_list.json'  # 储存全部实验数据
     sub_directories = ['masks', 'gzdata', 'results', 'images']
 
     database = TinyDB(db_path)
@@ -16,21 +16,21 @@ class Experiment(object):
                  species="Brassica", start_img=0, end_img=None, bg_remover="GMM", panel_labelled=False,
                  _yuv_ranges_set=False,
                  _eid=None, _status="", use_colour=False, use_delta=False):
-        self.name = name
-        self.img_path = img_path
-        self.panel_n = panel_n
-        self.seeds_col_n = seeds_col_n
-        self.seeds_row_n = seeds_row_n
-        self.species = species
-        self.start_img = start_img
-        self.end_img = end_img
-        self.bg_remover = bg_remover
-        self.panel_labelled = panel_labelled
-        self._yuv_ranges_set = _yuv_ranges_set
-        self._eid = _eid
-        self._status = _status
-        self.use_colour = use_colour
-        self.use_delta = use_delta
+        self.name = name  # 实验名称
+        self.img_path = img_path  # 图像路径
+        self.panel_n = panel_n  # 面板数
+        self.seeds_col_n = seeds_col_n  # 列数
+        self.seeds_row_n = seeds_row_n  # 行数
+        self.species = species  # 品种
+        self.start_img = start_img  # 起始图片
+        self.end_img = end_img  # 结束图片
+        self.bg_remover = bg_remover  # 背景算法
+        self.panel_labelled = panel_labelled  # 参数不明
+        self._yuv_ranges_set = _yuv_ranges_set  # 设置YUV
+        self._eid = _eid  # 实验标识
+        self._status = _status  # 状态
+        self.use_colour = use_colour  # 使用颜色特征
+        self.use_delta = use_delta  # 使用增量要素
 
         self.exp_path = exp_path  # "./data/experiments/%s" % (slugify(self.name))
 
@@ -74,9 +74,9 @@ class Experiment(object):
     @eid.setter
     def eid(self, value):
         if self._eid is not value:
-            self._eid = value
+            self._eid = value  # 获取实验标识
             # self.database.update(vars(self), eids=[self.eid])
-            self.database.update(vars(self), self.query._eid == self.eid)
+            self.database.update(vars(self), self.query.name == self.name)
             # 不需要更新GUI
 
     def get_results_dir(self):
@@ -92,6 +92,7 @@ class Experiment(object):
         return os.path.join(self.get_results_dir(), "results.jpg")
 
     def create_directories(self):
+        """创建实验文件夹及其子文件夹"""
         if not os.path.exists(self.exp_path):
             os.makedirs(self.exp_path)
             for sub_dir in Experiment.sub_directories:
@@ -104,4 +105,5 @@ class Experiment(object):
             self.create_directories()
 
     def insert_into_database(self):
+        # 保存数据到json
         self.eid = Experiment.database.insert(vars(self))

@@ -35,6 +35,11 @@ class EditExperiment(Tkinter.Toplevel):
             text="实验名称: ",
             anchor=Tkinter.W
         )
+        self.name_suggest = Tkinter.Label(
+            master=self,
+            text="不建议修改实验名称",
+            anchor=Tkinter.W
+        )
         v = Tkinter.StringVar()
         self.name_entry = Tkinter.Entry(master=self, text=v)
         v.set(experiment.name)
@@ -185,6 +190,14 @@ class EditExperiment(Tkinter.Toplevel):
             in_=self,
             column=2,
             columnspan=1,
+            row=1,
+            sticky='ew'
+        )
+
+        self.name_suggest.grid(
+            in_=self,
+            column=3,
+            columnspan=2,
             row=1,
             sticky='ew'
         )
@@ -400,11 +413,11 @@ class EditExperiment(Tkinter.Toplevel):
         use_colour = self.use_colour.get()
         use_delta = self.use_delta.get()
         pre_conditions = [
-            (len(name) < 1, "Experiment name is too short"),
-            (len(dir_) < 1, "Need to enter a directory"),
-            (len(panel_n) < 1, "Need to enter the number of panels"),
-            (len(seeds_col_n) < 1, "Need to enter the number of seeds per column"),
-            (len(seeds_row_n) < 1, "Need to enter the number of seeds per row"),
+            (len(name) < 1, "请输入实验名称"),
+            (len(dir_) < 1, "请输入图像路径"),
+            (len(panel_n) < 1, "请输入面板数量"),
+            (len(seeds_col_n) < 1, "请输入每列的种子数"),
+            (len(seeds_row_n) < 1, "请输入每行的种子数"),
         ]
 
         if not self._warning_conditions(pre_conditions):
@@ -420,15 +433,15 @@ class EditExperiment(Tkinter.Toplevel):
 
         post_conditions = [
             (name_cond,
-             "Experiment with this name already exists"),
-            (not os.path.exists(dir_), "Cannot find experiment directory"),
+             "实验名称与已有的实验重复"),
+            (not os.path.exists(dir_), "图像文件夹不存在"),
             (len(os.listdir(dir_)) < 1,
-             "Directory does not contain any files"),
-            (not self._is_int(panel_n), "Panel value needs to be an integer"),
-            (not self._is_int(seeds_row_n), "Seeds row value needs to be an integer"),
-            (not self._is_int(seeds_col_n), "Seeds column value needs to be an integer"),
-            (not self._is_int(start_img), "Start image index needs to be an integer"),
-            (not self._is_int(end_img), "End image index needs to be an integer")
+             "图像文件夹为空"),
+            (not self._is_int(panel_n), "面板数量必须是整数"),
+            (not self._is_int(seeds_row_n), "种子行数必须是整数"),
+            (not self._is_int(seeds_col_n), "种子列数必须是整数"),
+            (not self._is_int(start_img), "起始图像序号必须是整数"),
+            (not self._is_int(end_img), "结束图像序号必须是整数")
         ]
 
         if not self._warning_conditions(post_conditions):
@@ -448,7 +461,7 @@ class EditExperiment(Tkinter.Toplevel):
             start_img = 0
         if not imgs:
             messagebox.showwarning("Warning",
-                                   "Cannot find images in directory: {}".format(dir_))
+                                   "图像文件夹不存在: {}".format(dir_))
             self.app.lift()
             return
 

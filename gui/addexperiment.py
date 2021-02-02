@@ -10,11 +10,14 @@ from tinydb import where
 from helper.functions import slugify, get_images_from_dir
 from helper.experiment import Experiment
 
-pj = os.path.join
+pj = os.path.join  # 拼接路径与文件
 
 
 class AddExperiment(Tkinter.Toplevel):
     def __init__(self, app):
+        """
+        添加实验
+        """
         Tkinter.Toplevel.__init__(self)
 
         self.app = app
@@ -22,16 +25,14 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.title("添加实验")
         self.resizable(width=False, height=False)
-        self.iconbitmap(
-
-            '.\logo.ico')
+        self.iconbitmap('.\logo.ico')
 
         self.name_label = Tkinter.Label(
             master=self,
             text="实验名称: ",
-            anchor=Tkinter.W
+            anchor=Tkinter.W  # 描点为西
         )
-        self.name_entry = Tkinter.Entry(master=self)
+        self.name_entry = Tkinter.Entry(master=self)  # 输入框
 
         self.dir_label = Tkinter.Label(
             master=self,
@@ -54,7 +55,7 @@ class AddExperiment(Tkinter.Toplevel):
         )
         self.species_var = Tkinter.StringVar(self)
         self.species = self.app.core.species_classes.keys()
-        self.species_var.set(list(self.species)[0])  # default value
+        self.species_var.set(list(self.species)[0])  # 默认值
         self.species_options = Tkinter.OptionMenu(
             self,
             self.species_var,
@@ -68,7 +69,7 @@ class AddExperiment(Tkinter.Toplevel):
         )
         self.removers_var = Tkinter.StringVar(self)
         self.removers = ['GMM', 'SGD', 'UNet']
-        self.removers_var.set(self.removers[0])  # default value
+        self.removers_var.set(self.removers[0])  # 默认值
         self.bg_rm_options = Tkinter.OptionMenu(
             self,
             self.removers_var,
@@ -147,10 +148,10 @@ class AddExperiment(Tkinter.Toplevel):
 
         self.name_entry.grid(
             in_=self,
-            column=2,
-            columnspan=1,
-            row=1,
-            sticky='ew'
+            column=2,  # 列数
+            columnspan=1,  # 跨单元格
+            row=1,  # 行数
+            sticky='ew'  # 方位
         )
 
         self.dir_label.grid(
@@ -163,13 +164,13 @@ class AddExperiment(Tkinter.Toplevel):
         self.dir_entry.grid(
             in_=self,
             column=2,
-            columnspan=1,
+            columnspan=2,
             row=2,
             sticky='ew'
         )
         self.dir_button.grid(
             in_=self,
-            column=3,
+            column=4,
             row=2,
             sticky='ew'
         )
@@ -320,8 +321,8 @@ class AddExperiment(Tkinter.Toplevel):
         )
 
         for i in range(1, 14):
-            self.grid_rowconfigure(i, pad=5)
-        self.grid_columnconfigure(2, minsize=200)
+            self.grid_rowconfigure(i, pad=10)
+        self.grid_columnconfigure(2, minsize=150)
 
     def _get_exp_dir(self):
         self.dir_entry.delete(0, 'end')
@@ -330,14 +331,14 @@ class AddExperiment(Tkinter.Toplevel):
         self.lift()
 
     def _warning_conditions(self, warn_conds):
-        for cond, msg in warn_conds:
+        for cond, msg in warn_conds:  # 检查输入
             if cond:
                 messagebox.showwarning(
                     "添加实验",
                     msg
                 )
                 return False
-                # if we reach here then everything was okay
+                # 如果我们到了这里一切都会好起来的
         return True
 
     def _is_int(self, n):
@@ -348,7 +349,7 @@ class AddExperiment(Tkinter.Toplevel):
             return False
 
     def _add(self):
-        name = self.name_entry.get()
+        name = self.name_entry.get()  # 获取输入
         dir_ = self.dir_entry.get()
         panel_n = self.panel_num_entry.get()
         seeds_row_n = self.seeds_per_panel_row_entry.get()
@@ -369,11 +370,11 @@ class AddExperiment(Tkinter.Toplevel):
             (len(panel_n) < 1, "请输入面板数量"),
             (len(seeds_col_n) < 1, "请输入每列的种子数"),
             (len(seeds_row_n) < 1, "请输入每行的种子数"),
-            (len(start_img) < 1, "Need to enter start image index"),
-            (len(end_img) < 1, "Need to enter end image index")
+            (len(start_img) < 1, "需要输入起始图像序号"),
+            (len(end_img) < 1, "需要输入结束图像序号")
         ]
 
-        if not self._warning_conditions(pre_conditions):
+        if not self._warning_conditions(pre_conditions):  # 检查错误输入
             self.app.lift()
             return
 
@@ -386,8 +387,8 @@ class AddExperiment(Tkinter.Toplevel):
             (not self._is_int(panel_n), "面板数量必须是整数"),
             (not self._is_int(seeds_row_n), "种子行数必须是整数"),
             (not self._is_int(seeds_col_n), "种子列数必须是整数"),
-            (not self._is_int(start_img), "起始图像索引必须是整数"),
-            (not self._is_int(end_img), "结束图像索引必须是整数")
+            (not self._is_int(start_img), "起始图像序号必须是整数"),
+            (not self._is_int(end_img), "结束图像序号必须是整数")
         ]
 
         if not self._warning_conditions(post_conditions):
@@ -402,16 +403,16 @@ class AddExperiment(Tkinter.Toplevel):
 
         imgs = get_images_from_dir(dir_)
         if end_img == -1:
-            end_img = len(imgs)
+            end_img = len(imgs)  # 没有输入结束图像默认为最后一张
         if start_img == -1:
-            start_img = 0
+            start_img = 0  # 没有输入起始图像默认为第一张
         if not imgs:
             messagebox.showwarning("Warning",
-                                   "图像文件夹不存在: {}".format(dir_))
+                                   "图像文件夹为空: {}".format(dir_))
             self.app.lift()
             return
 
-        exp_path = "./data/experiments/%s" % (slugify(name))
+        exp_path = "./data/experiments/%s" % (slugify(name))  # 实验数据文件夹
         exp = Experiment(name=name,
                          img_path=dir_,
                          panel_n=panel_n,

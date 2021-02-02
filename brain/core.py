@@ -36,10 +36,12 @@ class Core(threading.Thread):
         species_list = data["seeds"]
         self.species_classes = {}
 
+        print('种子品种列表：')
         for species in species_list:
             obj = SpeciesClassifier(**species)  # 从字典创建对象
             self.species_classes[obj.seed] = obj
             print(obj.seed)
+        print('')
 
     def run(self):
         """ 不是一个特别好的阻止方式。。。但要保持线的活力。"""
@@ -76,7 +78,7 @@ class Core(threading.Thread):
             if not self.current_experiment_threads[exp.eid].running:
                 self.stop_processor(exp.eid)
             else:
-                print("正在处理实验图像")
+                print("该实验已经开始分析")
 
     def zip_results(self, exp, out_dir):
         print(exp.name)
