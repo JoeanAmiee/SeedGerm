@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="24d76de8-0951-4f58-b3f1-94e543936b73" name="默认的" comment="">
+    <list default="true" id="24d76de8-0951-4f58-b3f1-94e543936b73" name="默认的" comment="Update Code">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brain/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/brain/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brain/processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/brain/processor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brain/speciesclassifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/brain/speciesclassifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/aboutwindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/aboutwindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/addexperiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/addexperiment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/application.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/application.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/editexperiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/editexperiment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/yuvranges.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/yuvranges.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helper/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/helper/experiment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helper/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/helper/functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helper/panel_segmenter.py" beforeDir="false" afterPath="$PROJECT_DIR$/helper/panel_segmenter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tinydb_test.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -174,7 +161,8 @@
       <workItem from="1612183885878" duration="7405000" />
       <workItem from="1612229106294" duration="5011000" />
       <workItem from="1612235391215" duration="710000" />
-      <workItem from="1612236661303" duration="62000" />
+      <workItem from="1612236661303" duration="161000" />
+      <workItem from="1612237017503" duration="770000" />
     </task>
     <task id="LOCAL-00001" summary="Update Code">
       <created>1611628370439</created>
@@ -211,7 +199,14 @@
       <option name="project" value="LOCAL" />
       <updated>1611928225432</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Update Code">
+      <created>1612236759921</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1612236759921</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

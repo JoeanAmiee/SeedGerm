@@ -1,4 +1,5 @@
-**本项目暂不可用，需要使用请访问原项目：[https://github.com/Crop-Phenomics-Group/SeedGerm](https://github.com/Crop-Phenomics-Group/SeedGerm)**
+**
+本项目仍在测试，需要使用建议访问原项目：[https://github.com/Crop-Phenomics-Group/SeedGerm](https://github.com/Crop-Phenomics-Group/SeedGerm)**
 
 # SeedGerm
 
