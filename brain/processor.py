@@ -63,6 +63,7 @@ random.seed(0)
 
 
 def get_crop_shape(target, refer):
+    """获得作物形状"""
     # 宽度，第三维
     cw = (target.get_shape()[2] - refer.get_shape()[2]).value
     assert (cw >= 0)
@@ -403,7 +404,8 @@ class ImageProcessor(threading.Thread):
         b = np.sqrt(np.power(flatCD(X, blue_E, blue_s), 2) / X.shape[0])
 
         TCD = self._gmm_get_TCD(X, blue_E, blue_s, b)
-        print("Training GMM background remover...")
+        # print("Training GMM background remover...")
+        print("正在训练GMM背景移除")
         bg_gmm = GaussianMixture(n_components=3, random_state=0)
         bg_gmm.fit(X)
 
@@ -543,7 +545,7 @@ class ImageProcessor(threading.Thread):
             self._train_clf(clf_in, ensemble_clf_f, X, y)
 
     def _train_unet(self):
-        print("Classifier: ", self.exp.bg_remover)
+        print("分类器：", self.exp.bg_remover)
 
         callbacks = [
             # EarlyStopping(patience=20, verbose=1),
@@ -553,7 +555,7 @@ class ImageProcessor(threading.Thread):
 
         images = self.all_imgs_list
 
-        print("Selecting training data")
+        print("选择训练数据")
 
         train_img_ids = list(range(self.exp.start_img, self.exp.start_img + 10))
         train_img_ids += [int((self.exp.end_img + self.exp.start_img) / 2) - 1,
@@ -603,7 +605,7 @@ class ImageProcessor(threading.Thread):
         X = np.vstack(train_images)
         Y = np.vstack(train_masks)
 
-        print("Training data selected:", X.shape, Y.shape)
+        print("所选训练数据：", X.shape, Y.shape)
 
         models = {}
 
@@ -649,7 +651,7 @@ class ImageProcessor(threading.Thread):
             with open(self.exp_masks_dir_frame % idx, "wb") as fh:
                 np.save(fh, img_masks)
 
-        self.app.status_string.set("Removing background %d %%" % int(
+        self.app.status_string.set("正在移除背景 %d %%" % int(
             float(idx) / (float(self.exp.end_img - self.exp.start_img)) * 100))
 
     def _train_clf(self, clf_in, ensemble_clf_f, X, y):
@@ -690,8 +692,8 @@ class ImageProcessor(threading.Thread):
     #         pickle.dump(grid, fh)
 
     def _create_transformed_data(self, rgb_pixels):
-        # Removed the random selection so to use as much data as possible.
-        # Get all of the bg pixels
+        # 删除随机选择，以便尽可能多地使用数据。
+        # 获取所有bg像素
         rgb_pixels = flatten_img(rgb_pixels)
         rgb_pixels = rgb_pixels[rgb_pixels.all(axis=1), :]
         return rgb_pixels
@@ -708,14 +710,13 @@ class ImageProcessor(threading.Thread):
         # 预测每个图像中的背景和前景像素
         for idx in tqdm(range(self.exp.start_img, self.exp.end_img)):
             img_masks = []
-            # Try to load predicted background/foreground mask for this image ID if it exists
+            # 尝试加载此图像ID的预测背景前景遮罩（如果存在）
             try:
                 img_masks = np.load(self.exp_masks_dir_frame % idx, allow_pickle=True)
             except Exception as e:
                 img = self.all_imgs_list[idx]
-                # For each panel in this image, crop the image to just panel of interest, predict the BG/FG pixels
-                # in this panel, apply dilation and erosion to the predicted mask, remove small objects that are
-                # unlikely to be seeds. Append this predicted mask to a list of masks for this image.
+                # 对于此图像中的每个面板，将图像裁剪为感兴趣的面板，预测此面板中的BGFG像素，对预测的遮罩应用膨胀和腐蚀
+                # 移除不太可能成为种子的小对象。将此预测的遮罩附加到此图像的遮罩列表中。
                 for p in self.panel_list:
                     panel_img = p.get_cropped_image(img)
                     pp_predicted = self._ensemble_predict(self.classifiers, flatten_img(panel_img), p)
@@ -726,11 +727,11 @@ class ImageProcessor(threading.Thread):
                     pp_predicted = remove_small_objects(pp_predicted)
                     img_masks.append(pp_predicted)
 
-                # Save list of masks for this image
+                # 保存此图像的遮罩列表
                 with open(self.exp_masks_dir_frame % idx, "wb") as fh:
                     np.save(fh, img_masks)
 
-            # Append list of masks for this image to a list that will contain masks for all images
+            # 将此图像的遮罩列表附加到包含所有图像遮罩的列表
             self.app.status_string.set("正在移除背景 %d %%" % int(
                 float(idx) / (float(self.exp.end_img - self.exp.start_img)) * 100))
             self.all_masks.append(img_masks)
@@ -768,7 +769,7 @@ class ImageProcessor(threading.Thread):
             mask_med = clear_border(np.median(mask_med, axis=2)).astype(np.bool)
             mask_med = remove_small_objects(mask_med)
 
-            # Label features in an array using the default structuring element which is a cross.
+            # 使用默认结构元素（十字）标记数组中的特征。
             labelled_array, num_features = measurements.label(mask_med)
             rprops = regionprops(labelled_array, coordinates='xy')
 
@@ -778,40 +779,40 @@ class ImageProcessor(threading.Thread):
                     SeedPanel(rp.label, rp.centroid, rp.bbox, rp.moments_hu, rp.area, rp.perimeter, rp.eccentricity,
                               rp.major_axis_length, rp.minor_axis_length, rp.solidity, rp.extent, rp.convex_area))
 
-            # Get maximum number of seeds
+            # 获取最大种子数
             pts = np.vstack([el.centroid for el in all_seed_rprops])
             in_mask = find_closest_n_points(pts, self.exp.seeds_n)
 
-            # If we've got less seeds than we should do, should we throw them away?
+            # 如果我们得到的种子比我们应该得到的少，我们应该扔掉它们吗？
             if len(in_mask) > self.exp.seeds_n:
                 all_seed_rprops_new = []
                 for rp, im in zip(all_seed_rprops, in_mask):
                     if im:
                         all_seed_rprops_new.append(rp)
                     else:
-                        # Remove false seed rprops from mask, probably need to reorder after
+                        # 从遮罩中删除假种子rprops，之后可能需要重新排序
                         labelled_array[labelled_array == rp.label] = 0
                 all_seed_rprops = all_seed_rprops_new
             # end if-----------------------------------#
 
-            # Remove extra 'seeds' (QR labels) from boundary
+            # 从边界移除额外的“种子”（QR标签）
             pts = np.vstack([el.centroid for el in all_seed_rprops])
             xy_range = get_xy_range(labelled_array)
             in_mask = find_pts_in_range(pts, xy_range)
 
-            # If we've got more seeds than we should do, should we throw them away?
+            # 如果我们的种子太多了，我们应该扔掉吗？
             if len(in_mask) > self.exp.seeds_n:
                 all_seed_rprops_new = []
                 for rp, im in zip(all_seed_rprops, in_mask):
                     if im:
                         all_seed_rprops_new.append(rp)
                     else:
-                        # Remove false seed rprops from mask
+                        # 从遮罩中删除错误的种子操作
                         labelled_array[labelled_array == rp.label] = 0
                 all_seed_rprops = all_seed_rprops_new
             # end if-----------------------------------#
 
-            # Need to update pts if we have pruned.
+            # 如果我们删减了，需要更新pts。
             pts = np.vstack([el.centroid for el in all_seed_rprops])
 
             pts_order = order_pts_lr_tb(pts, self.exp.seeds_n, xy_range, self.exp.seeds_col_n, self.exp.seeds_row_n)
@@ -820,7 +821,7 @@ class ImageProcessor(threading.Thread):
             new_mask = np.zeros(labelled_array.shape)
             for s_idx, s in enumerate(pts_order):
                 sr = all_seed_rprops[s]
-                # Reorder mask
+                # 重排序遮罩
                 new_mask[labelled_array == sr.label] = s_idx + 1
                 sr.label = s_idx + 1
                 new_order.append(sr)
@@ -828,7 +829,7 @@ class ImageProcessor(threading.Thread):
             all_seed_rprops = new_order
             labelled_array = new_mask
 
-            # We add an array of labels and the region proprties for each panel.
+            # 我们为每个面板添加一个标签数组和区域属性。
             self.panel_l_rprops.append((labelled_array, all_seed_rprops))
 
         minimum_areas = []
@@ -843,7 +844,7 @@ class ImageProcessor(threading.Thread):
                 mask_med = init_masks[idx][ipx]
                 mask_med = remove_small_objects(mask_med)
 
-                # Label features in an array using the default structuring element which is a cross.
+                # 使用默认结构元素（十字）标记数组中的特征。
                 labelled_array, num_features = measurements.label(mask_med)
                 rprops = regionprops(labelled_array, coordinates='xy')
 
@@ -858,13 +859,13 @@ class ImageProcessor(threading.Thread):
                     for i in range(len(all_seed_rprops)):
                         minimum_areas[ipx][i] = all_seed_rprops[i].area
 
-                # Get maximum number of seeds
+                # 获取最大种子数
                 if all_seed_rprops == []:
                     break
                 pts = np.vstack([el.centroid for el in all_seed_rprops])
                 in_mask = find_closest_n_points(pts, self.exp.seeds_n)
 
-                # If we've got less seeds than we should do, should we throw them away?
+                # 如果我们得到的种子比我们应该得到的少，我们应该扔掉它们吗？
                 if len(in_mask) > self.exp.seeds_n:
                     all_seed_rprops_new = []
                     for rp, im in zip(all_seed_rprops, in_mask):
@@ -875,14 +876,14 @@ class ImageProcessor(threading.Thread):
                         elif im:
                             all_seed_rprops_new.append(rp)
                         else:
-                            # Remove false seed rprops from mask
+                            # 从遮罩中删除错误的种子操作
                             labelled_array[labelled_array == rp.label] = 0
                             labelled_array[labelled_array > rp.label] -= 1
                     all_seed_rprops = all_seed_rprops_new
 
                 # end if-----------------------------------#
 
-                # Remove extra 'seeds' (QR labels) from boundary
+                # 从边界移除额外的“种子”（QR标签）
                 pts = np.vstack([el.centroid for el in all_seed_rprops])
                 xy_range = get_xy_range(labelled_array)
                 in_mask = find_pts_in_range(pts, xy_range)
@@ -899,7 +900,7 @@ class ImageProcessor(threading.Thread):
                 #     all_seed_rprops = all_seed_rprops_new
                 # end if-----------------------------------#
 
-                # Need to update pts if we have pruned.
+                # 如果我们删减了，需要更新pts。
                 pts = np.vstack([el.centroid for el in all_seed_rprops])
 
                 pts_order = order_pts_lr_tb(pts, self.exp.seeds_n, xy_range, self.exp.seeds_col_n, self.exp.seeds_row_n)
@@ -908,7 +909,7 @@ class ImageProcessor(threading.Thread):
                 new_mask = np.zeros(labelled_array.shape)
                 for s_idx, s in enumerate(pts_order):
                     sr = all_seed_rprops[s]
-                    # reorder mask
+                    # 重排序遮罩
                     new_mask[labelled_array == sr.label] = s_idx + 1
                     sr.label = s_idx + 1
                     new_order.append(sr)
@@ -994,7 +995,7 @@ class ImageProcessor(threading.Thread):
         # 分别评估每个面板，这样基因型之间的差异不会恶化结果
         for panel_idx, panel_object in enumerate(tqdm(self.panel_list)):
             try:
-                # This is the tuple of the labelled arrays generated from regionprops
+                # 这是从regionprops生成的标签数组的元组
                 panel_labels, panel_regionprops = self.panel_l_rprops[panel_idx]
                 p_masks = []
                 # 为每个图像提取特定面板的所有遮罩
@@ -1045,11 +1046,11 @@ class ImageProcessor(threading.Thread):
     def _analyse_results(self, proprtions):
         all_germ = []
         for i in range(self.exp.panel_n):
-            # 如果with不能打开，我们不应该对细菌进行操作。
+            # 如果with不能打开，我们不应该对胚芽进行操作。
             with open(pj(self.exp_results_dir, "germ_panel_%d.json" % (i))) as fh:
                 germ_d = json.load(fh)
 
-                # Ensure the germ_d isn't empty.
+                # 确保胚芽不是空的。
                 if len(germ_d) == 0:
                     continue
 
@@ -1067,7 +1068,7 @@ class ImageProcessor(threading.Thread):
             p_totals.append(len(rprop))
 
         if len(all_germ) == 0:
-            raise Exception("Germinated seeds found is 0. Try changing YUV values.")
+            raise Exception("找到的发芽种子为0。尝试更改YUV值。")
 
         print(p_totals)
 
@@ -1086,9 +1087,9 @@ class ImageProcessor(threading.Thread):
             for m in range(rows):
                 for n in range(cols):
                     if germ[m, n]:
-                        # For adding offset
+                        # 用于添加偏移
                         init_germ_time.append(n + self.exp.start_img)
-                        break  # Probably this is what causes problem
+                        break  # 也许这就是问题的根源
             initial_germ_time_data.append(init_germ_time)
 
         for i in range(len(cum_germ_data)):
@@ -1136,14 +1137,14 @@ class ImageProcessor(threading.Thread):
                 curr_dt = s_to_datetime(self.imgs[int(val)])
                 xtick_labels.append(hours_between(start_dt, curr_dt, round_minutes=True))
 
-            ax1.set_xlabel("Time (hours)")
+            ax1.set_xlabel("时间（小时）")
             ax1.set_xticklabels(xtick_labels, )
         else:
-            ax1.set_xlabel("Image ID")
+            ax1.set_xlabel("图像ID")
 
         ax1.legend(loc="upper left")
-        ax1.set_ylabel("Cumulative germinated percent")
-        ax1.set_title("Cumulative germination as percent")
+        ax1.set_ylabel("累计发芽率")
+        ax1.set_title("累积发芽率")
         ax1.grid()
 
         data = []
@@ -1177,7 +1178,7 @@ class ImageProcessor(threading.Thread):
         tbl_cells = tbl_props['children']
         for cell in tbl_cells:
             cell.set_height(0.1)
-        ax2.set_title("Percentage T values")
+        ax2.set_title("T值百分比")
         ax2.axis('off')
 
         # Old code for setting an end point when roots overlap
@@ -1189,12 +1190,12 @@ class ImageProcessor(threading.Thread):
                     # , whis='range'
                     )
         ax3.set_xlim([self.exp.start_img, self.exp.start_img + n_frames + 5])
-        ax3.set_ylabel("Panel number")
-        ax3.set_title('Germination time box plot')
+        ax3.set_ylabel("面板编号")
+        ax3.set_title('发芽时间箱形图')
         ax3.grid()
 
         if has_date:
-            ax3.set_xlabel("Time (hours)")
+            ax3.set_xlabel("时间（小时）")
             xtick_labels = []
             for val in ax3.get_xticks():
                 if int(val) >= len(self.imgs):
@@ -1203,7 +1204,7 @@ class ImageProcessor(threading.Thread):
                 xtick_labels.append(hours_between(start_dt, curr_dt, round_minutes=True))
             ax3.set_xticklabels(xtick_labels)
         else:
-            ax3.set_xlabel("Image ID")
+            ax3.set_xlabel("图像ID")
 
         print(cum_germ_data.iloc[-1, :] / np.array(p_totals))
 
@@ -1212,9 +1213,11 @@ class ImageProcessor(threading.Thread):
         ax4.set_yticks(range(1, 1 + self.exp.panel_n))
         ax4.set_ylim([0.5, self.exp.panel_n + .5])
         ax4.set_xlim([0., 1.])
-        ax4.set_ylabel("Panel number")
-        ax4.set_xlabel("Germinated proportion")
-        ax4.set_title("Proportion germinated")
+        ax4.set_ylabel("面板编号")
+        # ax4.set_xlabel("Germinated proportion")
+        ax4.set_xlabel("发芽率")
+        # ax4.set_title("Proportion germinated")
+        ax4.set_title("发芽率")
 
         ax3.set_ylim(ax3.get_ylim()[::-1])
         ax4.set_ylim(ax4.get_ylim()[::-1])
@@ -1248,19 +1251,19 @@ class ImageProcessor(threading.Thread):
         ))
 
     def _quantify_first_frame(self, proprtions):
-        """ Quantify the seed data from the first frame. 
-        To quantify:
-            - total seed number
-            - seeds analysed
-            - initial seed size
-            - initial seed roundness
-            - width/height ratio
-            - RGB mean
-            - germ rate at various percents
-            - seed x, y
+        """ 量化第一帧的种子数据。
+        量化：
+            - 种子总数
+            - 种子分析
+            - 初始种子大小
+            - 初始种子圆度
+            - 宽高比
+            - RGB平均值
+            - 不同百分比的发芽率
+            - 种子x，y
         """
 
-        # Only use date information if it is contained in the filename
+        # 仅当文件名中包含日期信息时才使用
         has_date = check_files_have_date(self.imgs[0])
         start_dt = None
         if has_date:
@@ -1274,7 +1277,7 @@ class ImageProcessor(threading.Thread):
 
         all_panel_data = []
 
-        # Panel analysis
+        # 面板分析
         for p_idx, (p_labels, p_rprops) in enumerate(self.panel_l_rprops):
 
             with open(pj(self.exp_results_dir, "germ_panel_%d.json" % (p_idx))) as fh:
@@ -1348,7 +1351,7 @@ class ImageProcessor(threading.Thread):
         df = pd.DataFrame(all_panel_data, columns=columns)
         df.to_csv(pj(self.exp_results_dir, "overall_results.csv"), index=False)
 
-        # Seed analysis
+        # 种子分析
         all_seed_results = []
 
         panel_seed_idxs = {}
@@ -1490,7 +1493,7 @@ class ImageProcessor(threading.Thread):
 
                 print("结束值：", self.end_idx + self.exp.start_img)
 
-                print(time.time() - start)
+                print('分析用时：', time.time() - start)
 
                 print("完成")
 

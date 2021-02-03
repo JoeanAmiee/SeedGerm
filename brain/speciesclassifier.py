@@ -55,24 +55,24 @@ class SpeciesClassifier:
         initial_lengths = []
         initial_hu_feas = []
 
-        # Create empty lists of colour features if using colour
+        # 如果使用颜色，则创建颜色特征的空列表
         if self.use_colour:
             colors_r = []
             colors_g = []
             colors_b = []
 
-        # For all images and masks
+        # 对于所有图像和遮罩
         for index, (mask, img_f) in enumerate(list(zip(self.panel_masks[:], self.all_imgs[:]))):
-            # Read respective image and create empty lists of features for this image
+            # 读取相应的图像并为此图像创建特征的空列表
             img = imread(img_f)
             hu_feas_labelled = []
             areas_labelled = []
             lengths_labelled = []
-            # Crop image to just the panel, get region properties of objects in the panel
+            # 将图像裁剪到面板上，获取面板中对象的区域属性
             img = self.panel.get_bbox_image(img)
             c_label, c_rprops = simple_label_next_frame(self.panel_labels, self.panel_regionprops, mask)
 
-            # For each seed found in the panel
+            # 对于面板中找到的每个种子
             for idx, rp in enumerate(c_rprops):
                 # If colour is being used, append the respective colour channel lists with rgb values f from
                 # the colour histogram function
@@ -313,7 +313,7 @@ class SpeciesClassifier:
                 m_rp = regionprops(m, coordinates="xy")
                 if not m_rp:
                     list_error = True
-                    print("Empty regionprops list in classifier")
+                    print("分类器中的regionprops列表为空")
                     break
 
                 m_rp = m_rp[0]

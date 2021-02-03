@@ -685,7 +685,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
             )
 
         if yes_overwrite:
-            print("Setting YUV range for panel {}".format(self.idx_p + 1))
+            print("设置面板 {} 的YUV范围".format(self.idx_p + 1))
             with open(new_path, "w+") as fh:
                 json.dump(yuv_ranges, fh)
             self.destroy()

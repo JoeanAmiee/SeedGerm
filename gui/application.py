@@ -314,7 +314,7 @@ class Application(Tkinter.Tk):
         if len(glob.glob(os.path.join(exp_results_dir, "*.csv"))) < 3:
             messagebox.showwarning(
                 "",
-                "Need results to save, process images first."
+                "请先处理图像，再保存结果。"
             )
             return
 
@@ -330,7 +330,7 @@ class Application(Tkinter.Tk):
     def _view_results(self):
         exp = self._get_exp()
         if not os.path.exists(exp.get_results_graph()):
-            print("Results not available.")
+            print("结果不可用。")
             return
         self.vr = ViewResults(exp)
 
@@ -366,7 +366,7 @@ class Application(Tkinter.Tk):
         )
 
         if yes_remove:
-            exp.status = "Reset"
+            exp.status = "已重置"
             exp.yuv_ranges_set = False
             exp.reset()
 
@@ -406,7 +406,7 @@ class Application(Tkinter.Tk):
 
         messagebox.showinfo(
             "",
-            "Masks Finished Saving."
+            "遮罩保存完毕"
         )
 
     def _save_masks(self):
@@ -415,7 +415,7 @@ class Application(Tkinter.Tk):
         if len(glob.glob(os.path.join(exp_results_dir, "*.csv"))) < 3:
             messagebox.showwarning(
                 "",
-                "Need results to save, process images first."
+                "请先处理图像，再保存结果。"
             )
             return
 
@@ -429,7 +429,7 @@ class Application(Tkinter.Tk):
         exp = self._get_exp()
         yes_remove = messagebox.askyesno(
             "",
-            "Are you sure you want to delete this experiment?"
+            "确实要删除此实验吗？"
         )
 
         if yes_remove:
