@@ -989,7 +989,7 @@ class ImageProcessor(threading.Thread):
         if self.all_masks is None:
             self.all_masks = []
             for i in range(self.exp.start_img, self.exp.end_img):
-                data = np.load(self.exp_masks_dir_frame % (i), allow_pickle=True)
+                data = np.load(self.exp_masks_dir_frame % i, allow_pickle=True)
                 self.all_masks.append(data)
 
         # 分别评估每个面板，这样基因型之间的差异不会恶化结果

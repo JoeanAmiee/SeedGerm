@@ -2,12 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="24d76de8-0951-4f58-b3f1-94e543936b73" name="默认的" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/brain/processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/brain/processor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brain/speciesclassifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/brain/speciesclassifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/application.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/application.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/yuvranges.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/yuvranges.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +48,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/data/experiments/demo_3" />
-    <property name="settings.editor.selected.configurable" value="ai.sourcery.intellij.SourceryConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -175,7 +172,26 @@
       <workItem from="1612268021524" duration="142000" />
       <workItem from="1612268322825" duration="74000" />
       <workItem from="1612313543734" duration="573000" />
-      <workItem from="1612321145739" duration="1533000" />
+      <workItem from="1612321145739" duration="1857000" />
+      <workItem from="1613269819156" duration="195000" />
+      <workItem from="1613807903536" duration="743000" />
+      <workItem from="1613808942194" duration="690000" />
+      <workItem from="1613867708266" duration="121000" />
+      <workItem from="1613889320684" duration="1089000" />
+      <workItem from="1613894281848" duration="90000" />
+      <workItem from="1613977945454" duration="168000" />
+      <workItem from="1613984476872" duration="22000" />
+      <workItem from="1613995822814" duration="49000" />
+      <workItem from="1613996396204" duration="53000" />
+      <workItem from="1614001863742" duration="17000" />
+      <workItem from="1614003808575" duration="3000" />
+      <workItem from="1614073398828" duration="150000" />
+      <workItem from="1614084410074" duration="96000" />
+      <workItem from="1614140624128" duration="599000" />
+      <workItem from="1614147129728" duration="609000" />
+      <workItem from="1614160130126" duration="604000" />
+      <workItem from="1615039309135" duration="1317000" />
+      <workItem from="1615093138953" duration="394000" />
     </task>
     <task id="LOCAL-00001" summary="Update Code">
       <created>1611628370439</created>
@@ -240,7 +256,14 @@
       <option name="project" value="LOCAL" />
       <updated>1612238443854</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Update Code">
+      <created>1612322977636</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1612322977636</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -252,6 +275,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Update Code" />
     <option name="LAST_COMMIT_MESSAGE" value="Update Code" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -266,7 +290,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/SeedGerm$demo.coverage" NAME="demo 覆盖结果" MODIFIED="1612016216680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/SeedGerm$main.coverage" NAME="main 覆盖结果" MODIFIED="1612258616517" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SeedGerm$main.coverage" NAME="main 覆盖结果" MODIFIED="1615040181508" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/SeedGerm$image_test.coverage" NAME="image_test 覆盖结果" MODIFIED="1611927272356" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/SeedGerm$tinydb_test.coverage" NAME="tinydb_test 覆盖结果" MODIFIED="1612000765551" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/SeedGerm$pip.coverage" NAME="pip更新 覆盖结果" MODIFIED="1611992935290" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
