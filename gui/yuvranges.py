@@ -369,6 +369,7 @@ class YUVPanelRanges(Tkinter.Toplevel):
             return mask_img.astype(np.bool)
 
         mask_img = _yuv_clip_image(self.img_01)
+        # 移除小的区域
         mask_img = remove_small_objects(
             fill_border(mask_img, 10, fillval=False),
             min_size=1024
